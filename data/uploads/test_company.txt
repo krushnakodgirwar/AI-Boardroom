@@ -1,0 +1,7 @@
+﻿AI Boardroom Test Company
+
+The company has an available budget of ₹50 lakh.
+The development cost is ₹8 lakh.
+Expected first-year revenue is ₹30 lakh.
+The AI prototype currently fails the required response-time
+target under heavy usage.

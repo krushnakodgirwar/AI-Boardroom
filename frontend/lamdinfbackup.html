@@ -1,0 +1,1724 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>AI Boardroom OS</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+:root{
+    /* PREMIUM OBSIDIAN PALETTE — BLUE / AQUA / VIOLET / AMBER */
+    --bg:#050608;
+    --text:#f5f7fb;
+    --muted:#8791a3;
+
+    /* Primary electric blue */
+    --gold:#3b82f6;
+    --gold-light:#7dd3fc;
+
+    /* Live network / aqua */
+    --sage:#2dd4bf;
+    --sage-light:#99f6e4;
+
+    /* AI intelligence accent */
+    --violet:#a78bfa;
+
+    /* Warm energy accent */
+    --amber:#f6b73c;
+
+    --line:rgba(148,163,184,.13);
+}
+
+html{
+    scroll-behavior:smooth;
+}
+
+body{
+    min-height:100vh;
+    overflow-x:hidden;
+    font-family:Arial,Helvetica,sans-serif;
+    color:var(--text);
+
+    background:
+        radial-gradient(circle at 82% 12%,rgba(167,139,250,.10),transparent 34%),
+        radial-gradient(circle at 12% 82%,rgba(45,212,191,.075),transparent 32%),
+        radial-gradient(circle at 50% 45%,rgba(59,130,246,.055),transparent 42%),
+        linear-gradient(135deg,#030406,#0a0d14,#040507);
+}
+
+/* BACKGROUND */
+
+.grid{
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    z-index:-5;
+
+    background-image:
+        linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px);
+
+    background-size:70px 70px;
+}
+
+.ambient{
+    position:fixed;
+    width:600px;
+    height:600px;
+    border-radius:50%;
+    filter:blur(120px);
+    opacity:.16;
+    pointer-events:none;
+    z-index:-4;
+
+    animation:ambientMove 14s ease-in-out infinite alternate;
+}
+
+.ambient.one{
+    background:var(--violet);
+    top:-250px;
+    right:-180px;
+}
+
+.ambient.two{
+    background:var(--sage);
+    bottom:-250px;
+    left:-180px;
+}
+
+@keyframes ambientMove{
+    from{
+        transform:translate(0,0) scale(1);
+    }
+
+    to{
+        transform:translate(-70px,50px) scale(1.12);
+    }
+}
+
+/* PARTICLES */
+
+.particle-field{
+    position:fixed;
+    inset:0;
+    overflow:hidden;
+    pointer-events:none;
+    z-index:-3;
+}
+
+.bg-particle{
+    position:absolute;
+    border-radius:50%;
+    background:var(--gold-light);
+
+    box-shadow:0 0 8px rgba(125,211,252,.34);
+
+    animation:floatParticle linear infinite;
+}
+
+@keyframes floatParticle{
+
+    0%{
+        transform:translateY(30px);
+        opacity:0;
+    }
+
+    15%,85%{
+        opacity:.35;
+    }
+
+    100%{
+        transform:translateY(-120vh);
+        opacity:0;
+    }
+}
+
+/* APP */
+
+.app{
+    width:min(1500px,calc(100% - 40px));
+    min-height:94vh;
+
+    margin:3vh auto;
+    padding:25px 42px;
+
+    border-radius:28px;
+
+    background:rgba(8,10,14,.82);
+
+    border:1px solid rgba(255,255,255,.07);
+
+    backdrop-filter:blur(20px);
+
+    box-shadow:0 35px 100px rgba(0,0,0,.4);
+}
+
+/* HEADER */
+
+header{
+    height:70px;
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    border-bottom:1px solid var(--line);
+}
+
+.brand{
+    display:flex;
+    align-items:center;
+    gap:14px;
+}
+
+.logo{
+    width:44px;
+    height:44px;
+
+    display:grid;
+    place-items:center;
+
+    border-radius:13px;
+
+    color:var(--gold-light);
+
+    border:1px solid rgba(59,130,246,.34);
+
+    background:rgba(59,130,246,.07);
+}
+
+.brand-title{
+    font-size:12px;
+    font-weight:900;
+    letter-spacing:.15em;
+}
+
+.brand-sub{
+    margin-top:5px;
+    font-size:7px;
+    color:#778398;
+    letter-spacing:.16em;
+}
+
+.header-right{
+    display:flex;
+    align-items:center;
+    gap:20px;
+}
+
+.status{
+    display:flex;
+    align-items:center;
+    gap:8px;
+
+    color:var(--sage-light);
+    font-size:8px;
+    letter-spacing:.12em;
+}
+
+.status-dot{
+    width:7px;
+    height:7px;
+    border-radius:50%;
+
+    background:var(--sage);
+
+    box-shadow:0 0 12px var(--sage);
+
+    animation:pulse 2s infinite;
+}
+
+@keyframes pulse{
+    50%{
+        transform:scale(1.4);
+        opacity:.7;
+    }
+}
+
+.sound-btn{
+    width:40px;
+    height:40px;
+
+    border-radius:10px;
+
+    cursor:pointer;
+
+    background:rgba(255,255,255,.03);
+
+    border:1px solid rgba(255,255,255,.09);
+
+    color:#aaa;
+}
+
+/* HERO */
+
+.hero{
+    min-height:690px;
+
+    display:grid;
+    grid-template-columns:.82fr 1.18fr;
+
+    align-items:center;
+}
+
+/* LEFT */
+
+.eyebrow{
+    display:flex;
+    align-items:center;
+    gap:12px;
+
+    margin-bottom:24px;
+
+    color:var(--gold);
+
+    font-size:9px;
+    font-weight:bold;
+    letter-spacing:.18em;
+}
+
+.eyebrow:before{
+    content:"";
+    width:32px;
+    height:1px;
+    background:var(--gold);
+}
+
+h1{
+    font-size:clamp(50px,5.5vw,82px);
+    line-height:.95;
+    letter-spacing:-.06em;
+}
+
+.highlight{
+    /* Text-only gradient inspired by the reference: cyan → blue → violet → pink */
+    background:linear-gradient(
+        100deg,
+        #55c7e8 0%,
+        #4f8fe3 30%,
+        #7864d4 60%,
+        #e14fae 100%
+    );
+
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+}
+
+.description{
+    max-width:510px;
+
+    margin-top:28px;
+
+    color:var(--muted);
+
+    font-size:14px;
+    line-height:1.9;
+}
+
+.actions{
+    display:flex;
+    align-items:center;
+    gap:20px;
+
+    margin-top:34px;
+}
+
+.cta{
+    border:none;
+
+    padding:16px 25px;
+
+    border-radius:10px;
+
+    cursor:pointer;
+
+    background:linear-gradient(
+        135deg,
+        var(--gold),
+        var(--violet),
+        var(--amber)
+    );
+
+    color:#080a0f;
+
+    font-size:9px;
+    font-weight:900;
+
+    letter-spacing:.13em;
+
+    transition:.3s;
+}
+
+.cta:hover{
+    transform:translateY(-3px);
+}
+
+.note{
+    color:#6f7b90;
+    font-size:8px;
+    line-height:1.7;
+}
+
+.features{
+    display:flex;
+    flex-wrap:wrap;
+    gap:20px;
+
+    margin-top:38px;
+}
+
+.feature{
+    color:#a9b4c8;
+
+    font-size:8px;
+    font-weight:bold;
+
+    letter-spacing:.11em;
+}
+
+.feature:before{
+    content:"◆";
+    color:var(--violet);
+    margin-right:8px;
+}
+
+/* VISUAL */
+
+.visual{
+    height:670px;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    perspective:1400px;
+}
+
+.engine-wrapper{
+    position:relative;
+
+    width:680px;
+    height:680px;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+/* CONNECTIONS */
+
+.connections{
+    position:absolute;
+    inset:0;
+
+    width:680px;
+    height:680px;
+
+    z-index:1;
+}
+
+.connection-line{
+    stroke:rgba(125,211,252,.10);
+    stroke-width:1;
+}
+
+.connection-line.active{
+    stroke:rgba(59,130,246,.52);
+
+    stroke-dasharray:8 8;
+
+    animation:dataFlow 2s linear infinite;
+}
+
+@keyframes dataFlow{
+    to{
+        stroke-dashoffset:-32;
+    }
+}
+
+/* AGENTS */
+
+.agent{
+    position:absolute;
+
+    width:110px;
+
+    text-align:center;
+
+    z-index:20;
+
+    opacity:0;
+    transform:scale(.7);
+}
+
+.agent.active{
+    animation:agentAppear .5s ease forwards;
+}
+
+@keyframes agentAppear{
+    to{
+        opacity:1;
+        transform:scale(1);
+    }
+}
+
+.agent-node{
+    width:16px;
+    height:16px;
+
+    margin:auto;
+
+    border-radius:50%;
+
+    background:#080a0f;
+
+    border:1px solid rgba(59,130,246,.60);
+
+    box-shadow:0 0 0 5px rgba(59,130,246,.045);
+}
+
+.agent.active .agent-node{
+    background:var(--sage);
+
+    box-shadow:
+        0 0 18px rgba(45,212,191,.58),
+        0 0 0 6px rgba(45,212,191,.05);
+}
+
+.agent-name{
+    margin-top:8px;
+
+    font-size:8px;
+    font-weight:bold;
+
+    letter-spacing:.13em;
+}
+
+.agent-role{
+    margin-top:4px;
+
+    color:#778398;
+
+    font-size:6px;
+    line-height:1.4;
+}
+
+/* AGENT POSITIONS */
+
+.agent-cso{top:10px;left:285px;}
+.agent-cfo{top:95px;left:70px;}
+.agent-cto{top:95px;right:70px;}
+
+.agent-legal{top:285px;left:0;}
+.agent-cmo{top:285px;right:0;}
+
+.agent-risk{bottom:115px;left:45px;}
+.agent-coo{bottom:115px;right:45px;}
+
+.agent-chro{bottom:15px;left:145px;}
+.agent-cpo{bottom:15px;right:145px;}
+
+.agent-cro{bottom:15px;left:285px;}
+
+/* ENGINE */
+
+.engine{
+    position:absolute;
+
+    width:400px;
+    height:400px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    cursor:pointer;
+
+    z-index:10;
+
+    transform-style:preserve-3d;
+
+    transition:transform .3s ease;
+}
+
+.engine-glow{
+    position:absolute;
+
+    width:470px;
+    height:470px;
+
+    border-radius:50%;
+
+    background:radial-gradient(
+        circle,
+        rgba(59,130,246,.16),
+        rgba(167,139,250,.055) 50%,
+        transparent 72%
+    );
+
+    filter:blur(25px);
+}
+
+/* CLOSED CORE */
+
+.closed{
+    position:absolute;
+
+    width:155px;
+    height:155px;
+
+    z-index:50;
+
+    display:grid;
+    place-items:center;
+
+    border-radius:50%;
+
+    background:radial-gradient(
+        circle at 35% 30%,
+        #182235,
+        #090c12 65%,
+        #030406
+    );
+
+    border:1px solid rgba(255,255,255,.15);
+
+    box-shadow:0 0 55px rgba(125,211,252,.10);
+}
+
+.closed-symbol{
+    font-size:48px;
+    color:var(--gold-light);
+}
+
+.closed.unlock{
+    animation:unlock .8s ease forwards;
+}
+
+@keyframes unlock{
+    to{
+        opacity:0;
+        transform:scale(.1);
+    }
+}
+
+/* RINGS */
+
+.layer{
+    position:absolute;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    opacity:0;
+    transform:scale(.25);
+}
+
+.layer.open{
+    animation:openLayer .7s cubic-bezier(.2,.85,.2,1) forwards;
+}
+
+@keyframes openLayer{
+    to{
+        opacity:1;
+        transform:scale(1);
+    }
+}
+
+.outer{
+    width:390px;
+    height:390px;
+}
+
+.outer-ring{
+    position:absolute;
+
+    width:390px;
+    height:390px;
+
+    border-radius:50%;
+
+    border:3px solid rgba(59,130,246,.70);
+
+    box-shadow:0 0 25px rgba(59,130,246,.13);
+}
+
+.outer-teeth{
+    position:absolute;
+
+    width:410px;
+    height:410px;
+
+    border-radius:50%;
+
+    background:repeating-conic-gradient(
+        rgba(125,211,252,.74) 0deg 3deg,
+        transparent 3deg 10deg
+    );
+
+    mask:radial-gradient(
+        transparent 90%,
+        #000 91%
+    );
+}
+
+.armor{
+    width:325px;
+    height:325px;
+}
+
+.armor-ring{
+    width:325px;
+    height:325px;
+
+    border-radius:50%;
+
+    background:repeating-conic-gradient(
+        rgba(167,139,250,.78) 0deg 13deg,
+        transparent 13deg 21deg,
+        rgba(246,183,60,.68) 21deg 31deg,
+        transparent 31deg 43deg
+    );
+
+    mask:radial-gradient(
+        transparent 67%,
+        #000 68%,
+        #000 83%,
+        transparent 84%
+    );
+}
+
+.tech{
+    width:265px;
+    height:265px;
+}
+
+.tech-ring{
+    width:265px;
+    height:265px;
+
+    border-radius:50%;
+
+    border:2px solid rgba(167,139,250,.74);
+
+    box-shadow:0 0 20px rgba(167,139,250,.17);
+}
+
+.inner{
+    width:210px;
+    height:210px;
+}
+
+.inner-ring{
+    width:210px;
+    height:210px;
+
+    border-radius:50%;
+
+    background:repeating-conic-gradient(
+        rgba(45,212,191,.80) 0deg 6deg,
+        transparent 6deg 15deg
+    );
+
+    mask:radial-gradient(
+        transparent 65%,
+        #000 66%,
+        #000 82%,
+        transparent 83%
+    );
+}
+
+/* AI CORE */
+
+.core{
+    position:absolute;
+
+    width:155px;
+    height:155px;
+
+    z-index:40;
+
+    opacity:0;
+    transform:scale(.5);
+
+    display:flex;
+    flex-direction:column;
+
+    justify-content:center;
+    align-items:center;
+
+    text-align:center;
+
+    border-radius:50%;
+
+    background:radial-gradient(
+        circle at 35% 30%,
+        #132033,
+        #080a0f 65%,
+        #020304
+    );
+
+    border:1px solid rgba(255,255,255,.16);
+
+    box-shadow:0 0 65px rgba(167,139,250,.18);
+}
+
+.core.show{
+    animation:showCore .7s ease forwards;
+}
+
+@keyframes showCore{
+    to{
+        opacity:1;
+        transform:scale(1);
+    }
+}
+
+.core-symbol{
+    font-size:28px;
+    color:var(--gold-light);
+}
+
+.core-title{
+    margin-top:8px;
+
+    font-size:7px;
+    font-weight:bold;
+
+    letter-spacing:.12em;
+}
+
+.core-status{
+    margin-top:7px;
+
+    color:var(--sage-light);
+
+    font-size:6px;
+
+    letter-spacing:.12em;
+}
+
+/* SPIN */
+
+.spin-clockwise{
+    animation:clockwiseSpin 5.8s ease-out forwards;
+}
+
+.spin-counter{
+    animation:counterSpin 5.8s ease-out forwards;
+}
+
+@keyframes clockwiseSpin{
+    0%{transform:rotate(0deg);}
+    25%{transform:rotate(1080deg);}
+    60%{transform:rotate(2520deg);}
+    100%{transform:rotate(3600deg);}
+}
+
+@keyframes counterSpin{
+    0%{transform:rotate(0deg);}
+    25%{transform:rotate(-900deg);}
+    60%{transform:rotate(-2100deg);}
+    100%{transform:rotate(-3240deg);}
+}
+
+/* SPARKS */
+
+.spark-zone{
+    position:absolute;
+
+    width:470px;
+    height:470px;
+
+    pointer-events:none;
+
+    z-index:60;
+}
+
+.spark{
+    position:absolute;
+
+    width:3px;
+    height:3px;
+
+    border-radius:50%;
+
+    background:var(--gold-light);
+
+    box-shadow:0 0 9px var(--gold-light);
+
+    opacity:0;
+}
+
+.spark.fly{
+    animation:sparkFly .8s ease-out forwards;
+}
+
+@keyframes sparkFly{
+
+    0%{
+        opacity:1;
+        transform:translate(0,0) scale(1);
+    }
+
+    100%{
+        opacity:0;
+
+        transform:
+            translate(var(--x),var(--y))
+            scale(.1);
+    }
+}
+
+/* LABEL */
+
+.engine-label{
+    position:absolute;
+
+    bottom:65px;
+
+    left:50%;
+
+    transform:translateX(-50%);
+
+    font-size:7px;
+
+    color:#6f7b90;
+
+    letter-spacing:.16em;
+
+    white-space:nowrap;
+}
+
+/* FOOTER */
+
+footer{
+    display:flex;
+    justify-content:center;
+    flex-wrap:wrap;
+
+    gap:14px;
+
+    padding-top:20px;
+
+    border-top:1px solid var(--line);
+}
+
+footer span{
+    font-size:7px;
+    color:#6f7b90;
+
+    letter-spacing:.13em;
+}
+
+/* RESPONSIVE */
+
+@media(max-width:1150px){
+
+    .hero{
+        grid-template-columns:1fr;
+    }
+
+    .hero-text{
+        padding-top:60px;
+        text-align:center;
+    }
+
+    .eyebrow,
+    .actions,
+    .features{
+        justify-content:center;
+    }
+
+    .description{
+        margin-left:auto;
+        margin-right:auto;
+    }
+}
+
+@media(max-width:750px){
+
+    .app{
+        width:calc(100% - 16px);
+        padding:18px;
+    }
+
+    .brand-sub,
+    .status{
+        display:none;
+    }
+
+    .visual{
+        transform:scale(.56);
+
+        width:180%;
+        margin-left:-40%;
+
+        margin-top:-120px;
+        margin-bottom:-120px;
+    }
+
+    h1{
+        font-size:48px;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="grid"></div>
+
+<div class="ambient one"></div>
+<div class="ambient two"></div>
+
+<div class="particle-field" id="particleField"></div>
+
+<div class="app">
+
+<header>
+
+    <div class="brand">
+
+        <div class="logo">◈</div>
+
+        <div>
+            <div class="brand-title">AI BOARDROOM OS</div>
+
+            <div class="brand-sub">
+                AGENTIC AI OPERATING SYSTEM
+            </div>
+        </div>
+
+    </div>
+
+    <div class="header-right">
+
+        <div class="status">
+            <div class="status-dot"></div>
+            EXECUTIVE NETWORK ONLINE
+        </div>
+
+        <button class="sound-btn" id="soundButton">🔇</button>
+
+    </div>
+
+</header>
+
+<main class="hero">
+
+<section class="hero-text">
+
+    <div class="eyebrow">
+        AUTONOMOUS EXECUTIVE INTELLIGENCE
+    </div>
+
+    <h1>
+        Command an<br>
+        <span class="highlight">AI organization.</span>
+    </h1>
+
+    <p class="description">
+        AI Boardroom brings together ten specialist executive
+        AI agents that analyze finance, technology, markets,
+        operations, strategy, product, revenue, legal,
+        risk and workforce intelligence.
+    </p>
+
+    <div class="actions">
+
+        <button class="cta" id="enterButton">
+            ENTER AI BOARDROOM →
+        </button> 
+
+        <a href="/boardroom" class="cta">
+          ENTER AI BOARDROOM →
+        </a>
+
+        <div class="note">
+            10 specialist agents.<br>
+            One intelligent organization.
+        </div>
+
+    </div>
+
+    <div class="features">
+
+        <div class="feature">MULTI-AGENT ANALYSIS</div>
+        <div class="feature">AUTONOMOUS ROUTING</div>
+        <div class="feature">EXECUTIVE SYNTHESIS</div>
+
+    </div>
+
+</section>
+
+<section class="visual">
+
+<div class="engine-wrapper">
+
+<svg class="connections" viewBox="0 0 680 680">
+
+    <line class="connection-line" x1="340" y1="340" x2="340" y2="60"/>
+    <line class="connection-line" x1="340" y1="340" x2="130" y2="130"/>
+    <line class="connection-line" x1="340" y1="340" x2="550" y2="130"/>
+    <line class="connection-line" x1="340" y1="340" x2="55" y2="340"/>
+    <line class="connection-line" x1="340" y1="340" x2="625" y2="340"/>
+    <line class="connection-line" x1="340" y1="340" x2="110" y2="550"/>
+    <line class="connection-line" x1="340" y1="340" x2="570" y2="550"/>
+    <line class="connection-line" x1="340" y1="340" x2="210" y2="650"/>
+    <line class="connection-line" x1="340" y1="340" x2="470" y2="650"/>
+    <line class="connection-line" x1="340" y1="340" x2="340" y2="650"/>
+
+</svg>
+
+<!-- AGENTS -->
+
+<div class="agent agent-cso">
+    <div class="agent-node"></div>
+    <div class="agent-name">CSO</div>
+    <div class="agent-role">STRATEGY & DIRECTION</div>
+</div>
+
+<div class="agent agent-cfo">
+    <div class="agent-node"></div>
+    <div class="agent-name">CFO</div>
+    <div class="agent-role">FINANCE & ROI</div>
+</div>
+
+<div class="agent agent-cto">
+    <div class="agent-node"></div>
+    <div class="agent-name">CTO</div>
+    <div class="agent-role">TECHNOLOGY & SECURITY</div>
+</div>
+
+<div class="agent agent-legal">
+    <div class="agent-node"></div>
+    <div class="agent-name">LEGAL</div>
+    <div class="agent-role">LEGAL & COMPLIANCE</div>
+</div>
+
+<div class="agent agent-cmo">
+    <div class="agent-node"></div>
+    <div class="agent-name">CMO</div>
+    <div class="agent-role">MARKET & CUSTOMERS</div>
+</div>
+
+<div class="agent agent-risk">
+    <div class="agent-node"></div>
+    <div class="agent-name">RISK</div>
+    <div class="agent-role">BUSINESS RISK</div>
+</div>
+
+<div class="agent agent-coo">
+    <div class="agent-node"></div>
+    <div class="agent-name">COO</div>
+    <div class="agent-role">OPERATIONS</div>
+</div>
+
+<div class="agent agent-chro">
+    <div class="agent-node"></div>
+    <div class="agent-name">CHRO</div>
+    <div class="agent-role">PEOPLE & WORKFORCE</div>
+</div>
+
+<div class="agent agent-cpo">
+    <div class="agent-node"></div>
+    <div class="agent-name">CPO</div>
+    <div class="agent-role">PRODUCT STRATEGY</div>
+</div>
+
+<div class="agent agent-cro">
+    <div class="agent-node"></div>
+    <div class="agent-name">CRO</div>
+    <div class="agent-role">REVENUE & SALES</div>
+</div>
+
+
+<!-- ENGINE -->
+
+<div class="engine" id="engine">
+
+    <div class="engine-glow"></div>
+
+    <div class="closed" id="closed">
+        <div class="closed-symbol">◈</div>
+    </div>
+
+    <div class="layer outer" id="outerLayer">
+        <div class="outer-ring" id="outerRing"></div>
+        <div class="outer-teeth" id="outerTeeth"></div>
+    </div>
+
+    <div class="layer armor" id="armorLayer">
+        <div class="armor-ring" id="armorRing"></div>
+    </div>
+
+    <div class="layer tech" id="techLayer">
+        <div class="tech-ring" id="techRing"></div>
+    </div>
+
+    <div class="layer inner" id="innerLayer">
+        <div class="inner-ring" id="innerRing"></div>
+    </div>
+
+    <div class="core" id="core">
+
+        <div class="core-symbol">◈</div>
+
+        <div class="core-title" id="coreTitle">
+            SYSTEM INITIALIZING
+        </div>
+
+        <div class="core-status" id="coreStatus">
+            ● STANDBY
+        </div>
+
+    </div>
+
+    <div class="spark-zone" id="sparkZone"></div>
+
+</div>
+
+<div class="engine-label">
+    CLICK AI CORE TO REINITIALIZE
+</div>
+
+</div>
+
+</section>
+
+</main>
+
+<footer>
+
+    <span>MISSION</span>
+    <span>→</span>
+    <span>10 AI AGENTS</span>
+    <span>→</span>
+    <span>MULTI-AGENT ANALYSIS</span>
+    <span>→</span>
+    <span>EXECUTIVE SYNTHESIS</span>
+
+</footer>
+
+</div>
+
+
+<script>
+
+/* PARTICLES */
+
+const particleField=document.getElementById("particleField");
+
+for(let i=0;i<45;i++){
+
+    const p=document.createElement("div");
+
+    p.className="bg-particle";
+
+    p.style.left=Math.random()*100+"%";
+    p.style.top=Math.random()*100+"%";
+
+    const size=1+Math.random()*2;
+
+    p.style.width=size+"px";
+    p.style.height=size+"px";
+
+    p.style.animationDuration=12+Math.random()*15+"s";
+    p.style.animationDelay=-Math.random()*15+"s";
+
+    particleField.appendChild(p);
+}
+
+
+/* ELEMENTS */
+
+const engine=document.getElementById("engine");
+
+const closed=document.getElementById("closed");
+
+const outerLayer=document.getElementById("outerLayer");
+const armorLayer=document.getElementById("armorLayer");
+const techLayer=document.getElementById("techLayer");
+const innerLayer=document.getElementById("innerLayer");
+
+const outerRing=document.getElementById("outerRing");
+const outerTeeth=document.getElementById("outerTeeth");
+const armorRing=document.getElementById("armorRing");
+const techRing=document.getElementById("techRing");
+const innerRing=document.getElementById("innerRing");
+
+const core=document.getElementById("core");
+
+const coreTitle=document.getElementById("coreTitle");
+const coreStatus=document.getElementById("coreStatus");
+
+const agents=document.querySelectorAll(".agent");
+const lines=document.querySelectorAll(".connection-line");
+
+const sparkZone=document.getElementById("sparkZone");
+
+const soundButton=document.getElementById("soundButton");
+
+let playing=false;
+
+
+/* SOUND */
+
+let soundEnabled=false;
+let audioContext=null;
+
+
+soundButton.addEventListener("click",()=>{
+
+    soundEnabled=!soundEnabled;
+
+    soundButton.textContent=
+        soundEnabled ? "🔊" : "🔇";
+
+    if(soundEnabled){
+
+        audioContext=
+            audioContext ||
+            new(window.AudioContext || window.webkitAudioContext)();
+
+        if(audioContext.state==="suspended"){
+            audioContext.resume();
+        }
+
+        playTone(520,.08,.025,"sine");
+    }
+});
+
+
+function playTone(freq,duration,volume=.02,type="sine"){
+
+    if(!soundEnabled || !audioContext)return;
+
+    const osc=audioContext.createOscillator();
+    const gain=audioContext.createGain();
+
+    osc.type=type;
+
+    osc.frequency.setValueAtTime(
+        freq,
+        audioContext.currentTime
+    );
+
+    gain.gain.setValueAtTime(
+        .001,
+        audioContext.currentTime
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+        volume,
+        audioContext.currentTime+.02
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+        .001,
+        audioContext.currentTime+duration
+    );
+
+    osc.connect(gain);
+    gain.connect(audioContext.destination);
+
+    osc.start();
+
+    osc.stop(
+        audioContext.currentTime+duration+.05
+    );
+}
+
+
+/* UNLOCK SOUND */
+
+function playUnlockSound(){
+
+    playTone(120,.10,.035,"triangle");
+
+    setTimeout(()=>{
+        playTone(180,.10,.03,"triangle");
+    },100);
+
+    setTimeout(()=>{
+        playTone(250,.16,.025,"sine");
+    },200);
+}
+
+
+/* OPENING CLICK */
+
+function openingClick(){
+    playTone(300,.06,.018,"square");
+}
+
+
+/* SPARK SOUND */
+
+function sparkSound(){
+
+    playTone(
+        700+Math.random()*300,
+        .04,
+        .008,
+        "sine"
+    );
+}
+
+
+/* AGENT ACTIVATION */
+
+function agentSound(index){
+
+    const frequencies=[
+        330,370,415,440,494,
+        523,587,659,698,784
+    ];
+
+    playTone(
+        frequencies[index],
+        .12,
+        .02,
+        "sine"
+    );
+}
+
+
+/* FINAL CHIME */
+
+function finalChime(){
+
+    playTone(440,.18,.025,"sine");
+
+    setTimeout(()=>{
+        playTone(554,.18,.025,"sine");
+    },170);
+
+    setTimeout(()=>{
+        playTone(659,.35,.03,"sine");
+    },340);
+}
+
+
+/* RESET */
+
+function resetEngine(){
+
+    closed.className="closed";
+
+    outerLayer.className="layer outer";
+    armorLayer.className="layer armor";
+    techLayer.className="layer tech";
+    innerLayer.className="layer inner";
+
+    outerRing.className="outer-ring";
+    outerTeeth.className="outer-teeth";
+    armorRing.className="armor-ring";
+    techRing.className="tech-ring";
+    innerRing.className="inner-ring";
+
+    core.className="core";
+
+    coreTitle.textContent="SYSTEM INITIALIZING";
+    coreStatus.textContent="● STANDBY";
+
+    agents.forEach(agent=>{
+        agent.classList.remove("active");
+    });
+
+    lines.forEach(line=>{
+        line.classList.remove("active");
+    });
+
+    sparkZone.innerHTML="";
+}
+
+
+/* SPARK */
+
+function createSpark(){
+
+    const spark=document.createElement("div");
+
+    spark.className="spark";
+
+    const angle=Math.random()*Math.PI*2;
+
+    const radius=185+Math.random()*35;
+
+    const x=235+Math.cos(angle)*radius;
+    const y=235+Math.sin(angle)*radius;
+
+    const distance=45+Math.random()*90;
+
+    spark.style.left=x+"px";
+    spark.style.top=y+"px";
+
+    spark.style.setProperty(
+        "--x",
+        Math.cos(angle)*distance+"px"
+    );
+
+    spark.style.setProperty(
+        "--y",
+        Math.sin(angle)*distance+"px"
+    );
+
+    sparkZone.appendChild(spark);
+
+    requestAnimationFrame(()=>{
+        spark.classList.add("fly");
+    });
+
+    if(Math.random()>.55){
+        sparkSound();
+    }
+
+    setTimeout(()=>{
+        spark.remove();
+    },900);
+}
+
+
+function sparkBurst(){
+
+    let count=0;
+
+    const interval=setInterval(()=>{
+
+        createSpark();
+
+        count++;
+
+        if(count>=42){
+            clearInterval(interval);
+        }
+
+    },90);
+}
+
+
+/* MAIN ANIMATION */
+
+function playSequence(){
+
+    if(playing)return;
+
+    playing=true;
+
+    resetEngine();
+
+
+    /* UNLOCK */
+
+    setTimeout(()=>{
+
+        coreTitle.textContent="SYSTEM UNLOCKING";
+
+        closed.classList.add("unlock");
+
+        playUnlockSound();
+
+    },700);
+
+
+    /* OPEN RINGS */
+
+    setTimeout(()=>{
+
+        outerLayer.classList.add("open");
+        openingClick();
+
+    },1100);
+
+
+    setTimeout(()=>{
+
+        armorLayer.classList.add("open");
+        openingClick();
+
+    },1300);
+
+
+    setTimeout(()=>{
+
+        techLayer.classList.add("open");
+        openingClick();
+
+    },1500);
+
+
+    setTimeout(()=>{
+
+        innerLayer.classList.add("open");
+        openingClick();
+
+    },1700);
+
+
+    /* CORE */
+
+    setTimeout(()=>{
+
+        core.classList.add("show");
+
+        coreTitle.textContent="MULTI-AGENT";
+        coreStatus.textContent="● INITIALIZING";
+
+        playTone(360,.18,.02,"sine");
+
+    },1900);
+
+
+    /* START SPIN */
+
+    setTimeout(()=>{
+
+        outerRing.classList.add("spin-clockwise");
+        outerTeeth.classList.add("spin-clockwise");
+
+        armorRing.classList.add("spin-counter");
+
+        techRing.classList.add("spin-clockwise");
+
+        innerRing.classList.add("spin-counter");
+
+
+        coreTitle.textContent="ANALYZING";
+        coreStatus.textContent="● PROCESSING";
+
+
+        /* NO CONTINUOUS SPIN SOUND */
+
+        sparkBurst();
+
+    },2200);
+
+
+    /* ACTIVATE AGENTS */
+
+    setTimeout(()=>{
+
+        coreTitle.textContent="ACTIVATING";
+        coreStatus.textContent="● 10 AGENTS";
+
+
+        agents.forEach((agent,index)=>{
+
+            setTimeout(()=>{
+
+                agent.classList.add("active");
+
+                lines[index].classList.add("active");
+
+                agentSound(index);
+
+            },index*320);
+
+        });
+
+    },4200);
+
+
+    /* SYNCHRONIZED */
+
+    setTimeout(()=>{
+
+        coreTitle.textContent="SYNCHRONIZED";
+        coreStatus.textContent="● NETWORK ONLINE";
+
+        playTone(620,.18,.025,"sine");
+
+    },8000);
+
+
+    /* FINAL */
+
+    setTimeout(()=>{
+
+        coreTitle.textContent="AI BOARDROOM";
+        coreStatus.textContent="● READY";
+
+        finalChime();
+
+    },8600);
+
+
+    setTimeout(()=>{
+
+        playing=false;
+
+    },9800);
+
+}
+
+
+/* BUTTONS */
+
+engine.addEventListener("click",playSequence);
+
+document
+.getElementById("enterButton")
+.addEventListener("click",playSequence);
+
+
+/* AUTO START */
+
+window.addEventListener("load",()=>{
+
+    setTimeout(playSequence,800);
+
+});
+
+
+/* 3D EFFECT */
+
+engine.addEventListener("mousemove",event=>{
+
+    const rect=engine.getBoundingClientRect();
+
+    const x=event.clientX-rect.left;
+    const y=event.clientY-rect.top;
+
+    const rotateY=(x-rect.width/2)/220;
+    const rotateX=-(y-rect.height/2)/220;
+
+    engine.style.transform=
+        `rotateX(${rotateX}deg)
+         rotateY(${rotateY}deg)`;
+
+});
+
+
+engine.addEventListener("mouseleave",()=>{
+
+    engine.style.transform=
+        "rotateX(0deg) rotateY(0deg)";
+
+});
+
+</script>
+
+</body>
+</html> 
+
+
+
+
+
+
+
+
+
+

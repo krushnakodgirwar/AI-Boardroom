@@ -1,0 +1,32 @@
+AI BOARDROOM — RAG TEST DOCUMENT
+
+Project: Prototype Launch
+
+Technical Status:
+The prototype currently fails the required response-time target under heavy usage.
+The measured response time during heavy-load testing is 4.8 seconds.
+The required target is 2.0 seconds.
+The engineering team estimates that optimization and infrastructure changes are required before full commercial launch.
+
+Financial Information:
+Prototype development cost so far is $40,000.
+Estimated additional optimization cost is $15,000.
+Expected first-year revenue is $120,000 if the product launches successfully.
+Current operating budget can cover the additional optimization cost.
+
+Market Information:
+Initial customer interviews show moderate interest in the product.
+Customers consider response time an important requirement.
+Two competitors currently offer products with response times below 2.5 seconds.
+
+Operational Information:
+A limited pilot can be conducted with selected customers before full commercial launch.
+The operations team recommends validating performance under realistic heavy usage during the pilot.
+
+Risk Information:
+Launching without fixing the response-time problem could lead to customer dissatisfaction, additional support costs, and reputational damage.
+A limited pilot reduces the risk by allowing the company to validate performance before a full launch.
+
+Recommendation:
+The company should not proceed directly to full commercial launch.
+A limited pilot should be conducted after technical improvements, followed by another heavy-load performance test.

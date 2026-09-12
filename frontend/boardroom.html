@@ -1,0 +1,6807 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>AI Boardroom | Multi-Agent Intelligence</title>
+
+<style>
+
+/* =====================================================
+   ROOT
+===================================================== */
+
+:root{
+    --black:#030303;
+    --black-2:#08080a;
+    --black-3:#111116;
+    --panel:rgba(15,15,20,.82);
+    --panel-2:rgba(24,24,32,.78);
+
+    --text:#f5f5f5;
+    --muted:#8c8c95;
+
+    --border:rgba(255,255,255,.09);
+
+    --green:#00e676;
+    --blue:#2979ff;
+    --pink:#ff3d9a;
+    --orange:#ff7a18;
+    --gold:#ffd600;
+    --red:#ff4d4d;
+    --purple:#9c4dff;
+    --cyan:#00e5ff;
+    --amber:#ffb300;
+    --teal:#00d4a8;
+}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+html{
+    scroll-behavior:smooth;
+}
+
+body{
+    min-height:100vh;
+    overflow-x:hidden;
+
+    font-family:
+        Inter,
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    background:var(--black);
+    color:var(--text);
+}
+
+/* =====================================================
+   CINEMATIC BACKGROUND
+===================================================== */
+
+body::before{
+    content:"";
+
+    position:fixed;
+    inset:-30%;
+
+    pointer-events:none;
+    z-index:-2;
+
+    background:
+        radial-gradient(
+            circle at 20% 30%,
+            rgba(0,229,255,.12),
+            transparent 18%
+        ),
+
+        radial-gradient(
+            circle at 80% 20%,
+            rgba(255,61,154,.11),
+            transparent 20%
+        ),
+
+        radial-gradient(
+            circle at 50% 80%,
+            rgba(156,77,255,.12),
+            transparent 23%
+        ),
+
+        radial-gradient(
+            circle at 30% 75%,
+            rgba(0,230,118,.08),
+            transparent 18%
+        );
+
+    animation:auroraMove 18s ease-in-out infinite alternate;
+}
+
+@keyframes auroraMove{
+
+    0%{
+        transform:translate3d(-2%,-2%,0)
+        rotate(0deg);
+    }
+
+    100%{
+        transform:translate3d(3%,2%,0)
+        rotate(8deg);
+    }
+
+}
+
+/* subtle grid */
+
+body::after{
+
+    content:"";
+
+    position:fixed;
+    inset:0;
+
+    pointer-events:none;
+
+    z-index:-1;
+
+    opacity:.16;
+
+    background-image:
+
+        linear-gradient(
+            rgba(255,255,255,.025) 1px,
+            transparent 1px
+        ),
+
+        linear-gradient(
+            90deg,
+            rgba(255,255,255,.025) 1px,
+            transparent 1px
+        );
+
+    background-size:70px 70px;
+}
+
+
+/* =====================================================
+   APP
+===================================================== */
+
+.app{
+    min-height:100vh;
+}
+
+
+/* =====================================================
+   SIDEBAR
+===================================================== */
+
+.sidebar{
+
+    position:fixed;
+
+    top:0;
+    left:0;
+
+    width:255px;
+    height:100vh;
+
+    padding:22px 14px;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(10,10,10,.96),
+            rgba(5,5,5,.96)
+        );
+
+    border-right:1px solid var(--border);
+
+    backdrop-filter:blur(30px);
+
+    z-index:100;
+}
+
+.brand{
+
+    display:flex;
+    align-items:center;
+    gap:13px;
+
+    padding:10px 10px 24px;
+
+    border-bottom:1px solid var(--border);
+}
+
+.brand-logo{
+
+    width:45px;
+    height:45px;
+
+    border-radius:14px;
+
+    display:grid;
+    place-items:center;
+
+    font-size:20px;
+
+    background:
+        conic-gradient(
+            var(--green),
+            var(--cyan),
+            var(--blue),
+            var(--purple),
+            var(--pink),
+            var(--red),
+            var(--orange),
+            var(--gold),
+            var(--green)
+        );
+
+    color:#000;
+
+    box-shadow:
+        0 0 30px rgba(0,229,255,.16);
+}
+
+.brand h2{
+    font-size:13px;
+    letter-spacing:.13em;
+}
+
+.brand p{
+
+    margin-top:5px;
+
+    font-size:7px;
+    color:var(--muted);
+
+    letter-spacing:.16em;
+}
+
+.nav-label{
+
+    margin:28px 12px 10px;
+
+    font-size:8px;
+
+    color:#666;
+
+    letter-spacing:.18em;
+}
+
+.nav{
+    display:flex;
+    flex-direction:column;
+    gap:7px;
+}
+
+.nav-item{
+
+    border:none;
+
+    background:transparent;
+
+    color:#96969f;
+
+    padding:14px;
+
+    border-radius:13px;
+
+    display:flex;
+    align-items:center;
+
+    gap:13px;
+
+    cursor:pointer;
+
+    text-align:left;
+
+    transition:.3s;
+}
+
+.nav-item:hover{
+
+    color:white;
+
+    background:
+        rgba(255,255,255,.05);
+
+    transform:translateX(5px);
+}
+
+.nav-item.active{
+
+    color:white;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(0,229,255,.10),
+            rgba(156,77,255,.08),
+            rgba(255,61,154,.07)
+        );
+
+    border:
+        1px solid rgba(255,255,255,.08);
+}
+
+.nav-icon{
+    font-size:17px;
+}
+
+.sidebar-bottom{
+
+    position:absolute;
+
+    bottom:20px;
+
+    left:15px;
+    right:15px;
+}
+
+.system-card{
+
+    padding:15px;
+
+    border-radius:15px;
+
+    background:rgba(255,255,255,.035);
+
+    border:1px solid var(--border);
+}
+
+.status{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:9px;
+
+    font-size:8px;
+
+    letter-spacing:.13em;
+}
+
+.status-dot{
+
+    width:8px;
+    height:8px;
+
+    border-radius:50%;
+
+    background:var(--green);
+
+    box-shadow:
+        0 0 15px var(--green);
+
+    animation:pulse 2s infinite;
+}
+
+@keyframes pulse{
+
+    50%{
+        box-shadow:
+            0 0 30px var(--green);
+    }
+
+}
+
+.system-card p{
+
+    margin-top:10px;
+
+    font-size:7px;
+
+    color:var(--muted);
+}
+
+
+/* =====================================================
+   MAIN
+===================================================== */
+
+.main{
+
+    margin-left:255px;
+
+    width:calc(100% - 255px);
+
+    padding:28px 42px 60px;
+}
+
+
+/* =====================================================
+   TOPBAR
+===================================================== */
+
+.topbar{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    padding-bottom:24px;
+
+    border-bottom:
+        1px solid var(--border);
+}
+
+.breadcrumb{
+
+    font-size:8px;
+
+    color:#777;
+
+    letter-spacing:.17em;
+}
+
+.page-title{
+
+    margin-top:10px;
+
+    font-size:30px;
+
+    letter-spacing:-.03em;
+}
+
+.top-actions{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+}
+
+.top-button{
+
+    width:43px;
+    height:43px;
+
+    border-radius:13px;
+
+    color:white;
+
+    border:1px solid var(--border);
+
+    background:rgba(255,255,255,.035);
+
+    cursor:pointer;
+}
+
+.workspace-status{
+
+    padding:12px 16px;
+
+    border-radius:13px;
+
+    font-size:8px;
+
+    letter-spacing:.1em;
+
+    border:1px solid var(--border);
+
+    background:rgba(255,255,255,.035);
+}
+
+
+/* =====================================================
+   CONTENT
+===================================================== */
+
+.content{
+    padding-top:30px;
+}
+
+.section{
+
+    display:none;
+
+    animation:sectionIn .45s ease;
+}
+
+.section.active{
+    display:block;
+}
+
+@keyframes sectionIn{
+
+    from{
+        opacity:0;
+        transform:translateY(15px);
+    }
+
+    to{
+        opacity:1;
+        transform:none;
+    }
+
+}
+
+
+/* =====================================================
+   HERO
+===================================================== */
+
+.hero{
+
+    position:relative;
+
+    min-height:590px;
+
+    overflow:hidden;
+
+    border-radius:28px;
+
+    border:1px solid var(--border);
+
+    background:
+        linear-gradient(
+            130deg,
+            rgba(255,255,255,.025),
+            rgba(255,255,255,.008)
+        );
+
+    display:flex;
+
+    align-items:center;
+
+    padding:50px;
+}
+
+
+/* =====================================================
+   HERO TEXT
+===================================================== */
+
+.hero-text{
+
+    width:44%;
+
+    z-index:10;
+}
+
+.hero-tag{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    gap:8px;
+
+    padding:10px 15px;
+
+    border-radius:30px;
+
+    font-size:8px;
+
+    letter-spacing:.14em;
+
+    background:rgba(255,255,255,.04);
+
+    border:1px solid var(--border);
+}
+
+.hero-tag::before{
+
+    content:"";
+
+    width:7px;
+    height:7px;
+
+    border-radius:50%;
+
+    background:var(--green);
+
+    box-shadow:
+        0 0 14px var(--green);
+}
+
+.hero h1{
+
+    margin-top:25px;
+
+    font-size:52px;
+
+    line-height:1.03;
+
+    letter-spacing:-.055em;
+}
+
+.hero h1 span{
+
+    background:
+        linear-gradient(
+            90deg,
+            var(--cyan),
+            var(--blue),
+            var(--purple),
+            var(--pink),
+            var(--orange),
+            var(--gold)
+        );
+
+    background-size:300%;
+
+    -webkit-background-clip:text;
+
+    color:transparent;
+
+    animation:textFlow 7s linear infinite;
+}
+
+@keyframes textFlow{
+
+    to{
+        background-position:300%;
+    }
+
+}
+
+.hero-text p{
+
+    margin-top:22px;
+
+    max-width:440px;
+
+    color:var(--muted);
+
+    font-size:12px;
+
+    line-height:1.8;
+}
+
+.hero-buttons{
+
+    display:flex;
+
+    gap:13px;
+
+    margin-top:32px;
+}
+
+.primary-btn{
+
+    padding:15px 23px;
+
+    border:none;
+
+    border-radius:13px;
+
+    color:white;
+
+    cursor:pointer;
+
+    font-weight:bold;
+
+    background:
+        linear-gradient(
+            120deg,
+            var(--blue),
+            var(--purple),
+            var(--pink),
+            var(--orange)
+        );
+
+    background-size:300%;
+
+    transition:.35s;
+
+    box-shadow:
+        0 12px 35px rgba(156,77,255,.18);
+}
+
+.primary-btn:hover{
+
+    transform:
+        translateY(-4px)
+        scale(1.03);
+
+    background-position:100%;
+}
+
+.secondary-btn{
+
+    padding:15px 21px;
+
+    border-radius:13px;
+
+    color:white;
+
+    background:rgba(255,255,255,.035);
+
+    border:1px solid var(--border);
+
+    cursor:pointer;
+
+    transition:.3s;
+}
+
+.secondary-btn:hover{
+
+    background:rgba(255,255,255,.08);
+
+}
+
+
+/* =====================================================
+   AI AGENT DECK
+===================================================== */
+
+.deck-zone{
+
+    position:absolute;
+
+    right:0;
+
+    top:0;
+
+    width:58%;
+
+    height:100%;
+
+    perspective:1300px;
+
+    overflow:hidden;
+}
+
+.deck-core{
+
+    position:absolute;
+
+    left:50%;
+    top:50%;
+
+    width:150px;
+    height:150px;
+
+    transform:
+        translate(-50%,-50%);
+
+    border-radius:50%;
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:center;
+
+    justify-content:center;
+
+    z-index:20;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(255,255,255,.16),
+            rgba(255,255,255,.03) 55%,
+            transparent 70%
+        );
+
+    border:
+        1px solid rgba(255,255,255,.13);
+
+    box-shadow:
+        0 0 70px rgba(156,77,255,.18);
+
+    animation:coreFloat 4s ease-in-out infinite;
+}
+
+@keyframes coreFloat{
+
+    0%,100%{
+        transform:
+            translate(-50%,-50%)
+            translateY(0);
+    }
+
+    50%{
+        transform:
+            translate(-50%,-50%)
+            translateY(-12px);
+    }
+
+}
+
+.core-symbol{
+
+    font-size:38px;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--cyan),
+            var(--purple),
+            var(--pink),
+            var(--orange)
+        );
+
+    -webkit-background-clip:text;
+
+    color:transparent;
+}
+
+.deck-core h3{
+
+    margin-top:8px;
+
+    font-size:9px;
+
+    letter-spacing:.2em;
+}
+
+.deck-core p{
+
+    margin-top:5px;
+
+    font-size:6px;
+
+    color:#888;
+
+    letter-spacing:.12em;
+}
+
+
+/* =====================================================
+   ENERGY CONNECTIONS
+===================================================== */
+
+.energy-line{
+
+    position:absolute;
+
+    left:50%;
+    top:50%;
+
+    width:1px;
+
+    height:210px;
+
+    transform-origin:
+        bottom center;
+
+    background:
+        linear-gradient(
+            transparent,
+            var(--line),
+            transparent
+        );
+
+    opacity:.5;
+
+    z-index:1;
+
+    animation:energyPulse 3s ease-in-out infinite;
+}
+
+@keyframes energyPulse{
+
+    50%{
+        opacity:1;
+        filter:
+            drop-shadow(
+                0 0 8px var(--line)
+            );
+    }
+
+}
+
+
+/* =====================================================
+   AGENT CARDS
+===================================================== */
+
+.agent-float{
+
+    position:absolute;
+
+    width:135px;
+
+    min-height:105px;
+
+    padding:16px;
+
+    border-radius:18px;
+
+    cursor:pointer;
+
+    z-index:10;
+
+    color:white;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255,255,255,.09),
+            rgba(255,255,255,.018)
+        );
+
+    border:
+        1px solid
+        color-mix(
+            in srgb,
+            var(--agent-color) 40%,
+            transparent
+        );
+
+    backdrop-filter:
+        blur(16px);
+
+    box-shadow:
+        0 15px 40px rgba(0,0,0,.45);
+
+    transform-style:
+        preserve-3d;
+
+    transition:
+        transform .35s ease,
+        box-shadow .35s ease,
+        border-color .35s ease;
+
+    animation:
+        cardFloat
+        var(--float-time)
+        ease-in-out
+        infinite;
+}
+
+
+/* fallback for browsers */
+
+.agent-float::before{
+
+    content:"";
+
+    position:absolute;
+
+    inset:-1px;
+
+    border-radius:18px;
+
+    padding:1px;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--agent-color),
+            transparent 55%
+        );
+
+    mask:
+        linear-gradient(#fff 0 0)
+        content-box,
+        linear-gradient(#fff 0 0);
+
+    mask-composite:exclude;
+
+    opacity:.5;
+
+    pointer-events:none;
+}
+
+.agent-float:hover{
+
+    z-index:50;
+
+    transform:
+        translateZ(80px)
+        scale(1.12)
+        rotateX(0deg)
+        rotateY(0deg)
+        !important;
+
+    border-color:
+        var(--agent-color);
+
+    box-shadow:
+        0 20px 60px rgba(0,0,0,.6),
+        0 0 30px
+        color-mix(
+            in srgb,
+            var(--agent-color) 40%,
+            transparent
+        );
+}
+
+.agent-float.active{
+
+    z-index:60;
+
+    transform:
+        translateZ(100px)
+        scale(1.18)
+        !important;
+
+    border-color:
+        var(--agent-color);
+
+    box-shadow:
+        0 0 45px
+        color-mix(
+            in srgb,
+            var(--agent-color) 45%,
+            transparent
+        );
+}
+
+@keyframes cardFloat{
+
+    0%,100%{
+
+        translate:
+            0 0;
+
+    }
+
+    50%{
+
+        translate:
+            0 -12px;
+
+    }
+
+}
+
+.agent-top{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+}
+
+.agent-orb{
+
+    width:35px;
+    height:35px;
+
+    border-radius:50%;
+
+    display:grid;
+
+    place-items:center;
+
+    background:
+        color-mix(
+            in srgb,
+            var(--agent-color) 20%,
+            transparent
+        );
+
+    border:
+        1px solid var(--agent-color);
+
+    color:
+        var(--agent-color);
+
+    font-size:8px;
+
+    font-weight:bold;
+
+    box-shadow:
+        0 0 20px
+        color-mix(
+            in srgb,
+            var(--agent-color) 25%,
+            transparent
+        );
+}
+
+.agent-number{
+
+    color:#777;
+
+    font-size:7px;
+
+    letter-spacing:.1em;
+}
+
+.agent-float h3{
+
+    margin-top:12px;
+
+    font-size:11px;
+}
+
+.agent-float p{
+
+    margin-top:6px;
+
+    color:#96969e;
+
+    font-size:7px;
+
+    line-height:1.45;
+}
+
+.agent-status{
+
+    margin-top:11px;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:6px;
+
+    font-size:6px;
+
+    color:var(--agent-color);
+
+    letter-spacing:.1em;
+}
+
+.agent-status::before{
+
+    content:"";
+
+    width:5px;
+    height:5px;
+
+    border-radius:50%;
+
+    background:var(--agent-color);
+
+    box-shadow:
+        0 0 10px var(--agent-color);
+}
+
+
+/* =====================================================
+   CARD POSITIONS
+===================================================== */
+
+.a1{top:7%;left:39%;--float-time:5s;}
+.a2{top:18%;left:8%;--float-time:6s;}
+.a3{top:18%;right:7%;--float-time:5.5s;}
+
+.a4{top:43%;left:2%;--float-time:6.5s;}
+.a5{top:43%;right:1%;--float-time:5.8s;}
+
+.a6{bottom:10%;left:13%;--float-time:5.4s;}
+.a7{bottom:5%;left:38%;--float-time:6.2s;}
+.a8{bottom:10%;right:12%;--float-time:5.6s;}
+
+.a9{top:6%;left:12%;--float-time:6.8s;}
+.a10{top:6%;right:12%;--float-time:5.2s;}
+
+
+/* =====================================================
+   AGENT INFO POPUP
+===================================================== */
+
+.agent-info{
+
+    position:absolute;
+
+    right:35px;
+
+    bottom:28px;
+
+    width:290px;
+
+    padding:18px;
+
+    border-radius:17px;
+
+    z-index:70;
+
+    opacity:0;
+
+    transform:
+        translateY(20px);
+
+    pointer-events:none;
+
+    background:
+        rgba(12,12,12,.88);
+
+    border:
+        1px solid var(--border);
+
+    backdrop-filter:
+        blur(25px);
+
+    transition:.35s;
+}
+
+.agent-info.show{
+
+    opacity:1;
+
+    transform:none;
+}
+
+.agent-info small{
+
+    font-size:7px;
+
+    color:#888;
+
+    letter-spacing:.14em;
+}
+
+.agent-info h3{
+
+    margin-top:8px;
+
+    font-size:17px;
+}
+
+.agent-info p{
+
+    margin-top:8px;
+
+    color:#aaa;
+
+    font-size:9px;
+
+    line-height:1.6;
+}
+
+
+/* =====================================================
+   STATS
+===================================================== */
+
+.stats-grid{
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(4,1fr);
+
+    gap:16px;
+
+    margin-top:22px;
+}
+
+.stat-card{
+
+    position:relative;
+
+    overflow:hidden;
+
+    padding:22px;
+
+    border-radius:18px;
+
+    background:
+        rgba(255,255,255,.025);
+
+    border:
+        1px solid var(--border);
+
+    transition:.35s;
+}
+
+.stat-card:hover{
+
+    transform:
+        translateY(-6px);
+
+    background:
+        rgba(255,255,255,.045);
+}
+
+.stat-card::before{
+
+    content:"";
+
+    position:absolute;
+
+    top:0;
+    left:0;
+
+    width:100%;
+    height:2px;
+
+    background:
+        linear-gradient(
+            90deg,
+            var(--cyan),
+            var(--purple),
+            var(--pink),
+            var(--orange)
+        );
+
+    opacity:.7;
+}
+
+.stat-label{
+
+    font-size:8px;
+
+    color:#888;
+
+    letter-spacing:.13em;
+}
+
+.stat-value{
+
+    margin-top:15px;
+
+    font-size:27px;
+}
+
+.stat-status{
+
+    margin-top:8px;
+
+    font-size:7px;
+
+    color:var(--green);
+}
+
+
+/* =====================================================
+   PANELS
+===================================================== */
+
+.panel{
+
+    margin-top:22px;
+
+    padding:26px;
+
+    border-radius:21px;
+
+    background:
+        rgba(255,255,255,.022);
+
+    border:
+        1px solid var(--border);
+}
+
+.panel-title{
+
+    font-size:11px;
+
+    letter-spacing:.14em;
+}
+
+.panel-subtitle{
+
+    margin-top:8px;
+
+    color:var(--muted);
+
+    font-size:8px;
+}
+
+
+/* =====================================================
+   AGENT GRID
+===================================================== */
+
+.agent-grid{
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(5,1fr);
+
+    gap:14px;
+
+    margin-top:22px;
+}
+
+.agent-card{
+
+    padding:20px 12px;
+
+    text-align:center;
+
+    border-radius:17px;
+
+    background:
+        rgba(255,255,255,.025);
+
+    border:
+        1px solid var(--border);
+
+    transition:.35s;
+}
+
+.agent-card:hover{
+
+    transform:
+        translateY(-7px)
+        scale(1.02);
+
+    background:
+        rgba(255,255,255,.055);
+}
+
+.agent-avatar{
+
+    width:50px;
+    height:50px;
+
+    margin:auto;
+
+    border-radius:50%;
+
+    display:grid;
+
+    place-items:center;
+
+    font-size:9px;
+
+    font-weight:bold;
+}
+
+.agent-name{
+
+    margin-top:13px;
+
+    font-size:9px;
+}
+
+.agent-role{
+
+    margin-top:6px;
+
+    font-size:7px;
+
+    color:var(--muted);
+
+    line-height:1.5;
+}
+
+
+/* =====================================================
+   ASK BOARDROOM
+===================================================== */
+
+.mode-grid,
+.option-grid{
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(3,1fr);
+
+    gap:15px;
+}
+
+.mode-card{
+
+    padding:22px;
+
+    border-radius:17px;
+
+    cursor:pointer;
+
+    background:
+        rgba(255,255,255,.02);
+
+    border:
+        1px solid var(--border);
+
+    transition:.3s;
+}
+
+.mode-card:hover,
+.mode-card.selected{
+
+    transform:
+        translateY(-4px);
+
+    border-color:
+        rgba(255,255,255,.25);
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(0,229,255,.07),
+            rgba(156,77,255,.06),
+            rgba(255,61,154,.05)
+        );
+}
+
+.mode-icon{
+    font-size:25px;
+}
+
+.mode-card h3{
+
+    margin-top:14px;
+
+    font-size:12px;
+}
+
+.mode-card p{
+
+    margin-top:7px;
+
+    font-size:8px;
+
+    color:var(--muted);
+
+    line-height:1.6;
+}
+
+textarea{
+
+    width:100%;
+
+    min-height:160px;
+
+    margin-top:20px;
+
+    padding:19px;
+
+    border-radius:16px;
+
+    resize:vertical;
+
+    outline:none;
+
+    color:white;
+
+    background:
+        rgba(0,0,0,.35);
+
+    border:
+        1px solid var(--border);
+}
+
+textarea:focus{
+
+    border-color:
+        var(--purple);
+
+    box-shadow:
+        0 0 30px rgba(156,77,255,.1);
+}
+
+.option{
+
+    padding:17px;
+
+    text-align:center;
+
+    border-radius:14px;
+
+    cursor:pointer;
+
+    color:#999;
+
+    background:
+        rgba(255,255,255,.02);
+
+    border:
+        1px solid var(--border);
+
+    transition:.3s;
+}
+
+.option.selected{
+
+    color:white;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(41,121,255,.12),
+            rgba(156,77,255,.12)
+        );
+
+    border-color:
+        rgba(255,255,255,.18);
+}
+
+.board-mode{
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(2,1fr);
+
+    gap:15px;
+}
+
+.board-option{
+
+    padding:22px;
+
+    border-radius:17px;
+
+    cursor:pointer;
+
+    background:
+        rgba(255,255,255,.02);
+
+    border:
+        1px solid var(--border);
+
+    transition:.3s;
+}
+
+.board-option.selected{
+
+    border-color:
+        rgba(156,77,255,.5);
+
+    background:
+        rgba(156,77,255,.08);
+}
+
+.board-option h3{
+    font-size:12px;
+}
+
+.board-option p{
+
+    margin-top:8px;
+
+    font-size:8px;
+
+    color:var(--muted);
+}
+
+.button-area{
+
+    display:flex;
+
+    justify-content:flex-end;
+
+    margin-top:22px;
+}
+
+
+
+/* =====================================================
+   ANALYSIS
+===================================================== */
+
+.progress-item{
+
+    margin-top:13px;
+
+    padding:17px;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    border-radius:14px;
+
+    background:
+        rgba(255,255,255,.025);
+
+    border:
+        1px solid var(--border);
+}
+
+.progress-left{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:13px;
+}
+
+.progress-icon{
+
+    width:40px;
+    height:40px;
+
+    border-radius:50%;
+
+    display:grid;
+
+    place-items:center;
+
+    font-size:8px;
+}
+
+.progress-name{
+    font-size:9px;
+}
+
+.progress-task{
+
+    margin-top:5px;
+
+    font-size:7px;
+
+    color:var(--muted);
+}
+
+.progress-status{
+
+    font-size:8px;
+
+    color:#aaa;
+}
+
+
+/* =====================================================
+   HISTORY
+===================================================== */
+
+.history-item{
+
+    margin-top:13px;
+
+    padding:19px;
+
+    border-radius:15px;
+
+    background:
+        rgba(255,255,255,.025);
+
+    border:
+        1px solid var(--border);
+}
+
+.history-title{
+
+    font-size:8px;
+
+    letter-spacing:.12em;
+}
+
+.history-question{
+
+    margin-top:10px;
+
+    font-size:11px;
+}
+
+.history-time{
+
+    margin-top:9px;
+
+    font-size:7px;
+
+    color:var(--muted);
+}
+
+
+/* =====================================================
+   ACTIVATION OVERLAY
+===================================================== */
+
+.activation-overlay{
+
+    position:fixed;
+
+    inset:0;
+
+    z-index:999;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    pointer-events:none;
+
+    opacity:0;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(156,77,255,.25),
+            rgba(0,0,0,.95) 65%
+        );
+
+    transition:.4s;
+}
+
+.activation-overlay.show{
+
+    opacity:1;
+
+    animation:
+        activateFlash 1.6s ease forwards;
+}
+
+.activation-text{
+
+    font-size:12px;
+
+    letter-spacing:.35em;
+
+    color:white;
+
+    text-align:center;
+}
+
+.activation-text span{
+
+    display:block;
+
+    margin-top:14px;
+
+    font-size:40px;
+
+    background:
+        linear-gradient(
+            90deg,
+            var(--cyan),
+            var(--purple),
+            var(--pink),
+            var(--orange)
+        );
+
+    -webkit-background-clip:text;
+
+    color:transparent;
+}
+
+@keyframes activateFlash{
+
+    0%{
+        opacity:0;
+    }
+
+    25%{
+        opacity:1;
+    }
+
+    100%{
+        opacity:0;
+    }
+
+}
+
+
+/* =====================================================
+   ENTRANCE
+===================================================== */
+
+.hero.loaded .agent-float{
+
+    animation-name:
+        cardFloat,
+        enterCard;
+
+}
+
+@keyframes enterCard{
+
+    from{
+
+        opacity:0;
+
+        transform:
+            translate3d(
+                var(--enter-x),
+                var(--enter-y),
+                -300px
+            )
+            rotate(
+                var(--enter-rotate)
+            );
+
+    }
+
+    to{
+
+        opacity:1;
+
+    }
+
+}
+
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media(max-width:1150px){
+
+    .hero-text{
+        width:46%;
+    }
+
+    .deck-zone{
+        transform:scale(.88);
+        transform-origin:center right;
+    }
+
+}
+
+@media(max-width:900px){
+
+    .sidebar{
+        display:none;
+    }
+
+    .main{
+
+        margin-left:0;
+
+        width:100%;
+
+        padding:22px;
+    }
+
+    .hero{
+
+        min-height:900px;
+
+        align-items:flex-start;
+    }
+
+    .hero-text{
+        width:100%;
+    }
+
+    .deck-zone{
+
+        top:360px;
+
+        width:100%;
+
+        height:520px;
+
+        right:auto;
+        left:0;
+
+        transform:scale(.8);
+    }
+
+    .stats-grid{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+}
+
+@media(max-width:600px){
+
+    .main{
+        padding:15px;
+    }
+
+    .hero{
+        padding:25px;
+    }
+
+    .hero h1{
+        font-size:37px;
+    }
+
+    .top-actions{
+        display:none;
+    }
+
+    .stats-grid,
+    .mode-grid,
+    .option-grid,
+    .board-mode{
+        grid-template-columns:1fr;
+    }
+
+    .agent-grid{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .deck-zone{
+
+        transform:
+            scale(.58);
+
+        transform-origin:
+            top center;
+    }
+
+}
+
+
+/* =================================================
+AI CONTROL ROOM
+================================================= */
+
+#controlRoom{
+    min-height:100vh;
+}
+
+.control-room-shell{
+    padding:28px;
+    border-radius:24px;
+    border:1px solid rgba(0,229,255,.16);
+    background:
+        radial-gradient(circle at 50% 35%,rgba(0,229,255,.07),transparent 34%),
+        rgba(8,12,22,.88);
+    overflow:hidden;
+    position:relative;
+}
+
+.control-room-header{
+    display:flex;
+    justify-content:space-between;
+    gap:20px;
+    align-items:flex-start;
+    margin-bottom:28px;
+}
+
+.control-live{
+    display:flex;
+    align-items:center;
+    gap:9px;
+    color:#00e5ff;
+    font-size:9px;
+    letter-spacing:.15em;
+    white-space:nowrap;
+}
+
+.live-dot{
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    background:#00e676;
+    box-shadow:0 0 16px rgba(0,230,118,.9);
+    animation:livePulse 1.1s infinite;
+}
+
+@keyframes livePulse{
+    0%,100%{transform:scale(.8);opacity:.55}
+    50%{transform:scale(1.35);opacity:1}
+}
+
+.control-room-grid{
+    display:grid;
+    grid-template-columns:1.1fr .9fr;
+    gap:24px;
+}
+
+.control-core{
+    min-height:460px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    border-radius:20px;
+    border:1px solid rgba(255,255,255,.07);
+    background:linear-gradient(145deg,rgba(0,229,255,.035),rgba(156,77,255,.035));
+}
+
+.orbital-system{
+    width:330px;
+    height:330px;
+    position:relative;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.orbit{
+    position:absolute;
+    border-radius:50%;
+    border:1px solid rgba(0,229,255,.18);
+}
+
+.orbit-one{width:150px;height:150px;animation:orbitSpin 5s linear infinite}
+.orbit-two{width:230px;height:230px;border-color:rgba(156,77,255,.18);animation:orbitSpinReverse 8s linear infinite}
+.orbit-three{width:310px;height:310px;border-style:dashed;animation:orbitSpin 12s linear infinite}
+
+@keyframes orbitSpin{to{transform:rotate(360deg)}}
+@keyframes orbitSpinReverse{to{transform:rotate(-360deg)}}
+
+.control-core-center{
+    width:135px;
+    height:135px;
+    border-radius:50%;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    position:relative;
+    background:rgba(6,13,26,.96);
+    border:1px solid rgba(0,229,255,.55);
+    box-shadow:0 0 60px rgba(0,229,255,.13), inset 0 0 35px rgba(0,229,255,.07);
+    z-index:2;
+}
+
+.core-pulse{
+    position:absolute;
+    inset:-8px;
+    border-radius:50%;
+    border:1px solid rgba(0,229,255,.35);
+    animation:corePulse 1.8s infinite;
+}
+
+@keyframes corePulse{
+    0%{transform:scale(.85);opacity:1}
+    100%{transform:scale(1.2);opacity:0}
+}
+
+.core-symbol{
+    font-size:32px;
+    color:#00e5ff;
+    margin-bottom:7px;
+    text-shadow:0 0 20px rgba(0,229,255,.8);
+}
+
+#controlStage{
+    color:#fff;
+    font-size:9px;
+    letter-spacing:.14em;
+}
+
+#controlStageDetail{
+    color:#78839a;
+    font-size:7px;
+    margin-top:7px;
+}
+
+.execution-meter{
+    width:min(80%,420px);
+    margin-top:10px;
+}
+
+.execution-meter-top{
+    display:flex;
+    justify-content:space-between;
+    font-size:8px;
+    color:#8d98aa;
+    letter-spacing:.12em;
+    margin-bottom:9px;
+}
+
+#executionPercent{color:#00e5ff}
+
+.execution-track{
+    height:6px;
+    border-radius:10px;
+    background:rgba(255,255,255,.06);
+    overflow:hidden;
+}
+
+#executionBar{
+    width:0%;
+    height:100%;
+    border-radius:10px;
+    background:linear-gradient(90deg,#00e5ff,#9c4dff,#00e676);
+    box-shadow:0 0 18px rgba(0,229,255,.65);
+    transition:width .6s ease;
+}
+
+.control-feed{
+    min-height:460px;
+    border-radius:20px;
+    border:1px solid rgba(255,255,255,.07);
+    background:rgba(255,255,255,.018);
+    padding:18px;
+}
+
+.feed-title{
+    display:flex;
+    justify-content:space-between;
+    color:#8f9ab0;
+    font-size:8px;
+    letter-spacing:.14em;
+    padding-bottom:13px;
+    border-bottom:1px solid rgba(255,255,255,.07);
+}
+
+#controlTimer{color:#00e5ff}
+
+.control-feed-list{
+    max-height:400px;
+    overflow:auto;
+    padding-top:10px;
+}
+
+.feed-event{
+    display:grid;
+    grid-template-columns:10px 70px 1fr;
+    gap:10px;
+    padding:11px 0;
+    border-bottom:1px solid rgba(255,255,255,.045);
+    animation:feedIn .35s ease both;
+}
+
+@keyframes feedIn{
+    from{opacity:0;transform:translateY(8px)}
+    to{opacity:1;transform:translateY(0)}
+}
+
+.feed-event-dot{
+    width:7px;
+    height:7px;
+    border-radius:50%;
+    margin-top:3px;
+    background:#00e5ff;
+    box-shadow:0 0 10px rgba(0,229,255,.8);
+}
+
+.feed-event-time{
+    color:#667085;
+    font-size:8px;
+}
+
+.feed-event-text{
+    color:#b8c0cf;
+    font-size:10px;
+    line-height:1.5;
+}
+
+.control-agents-title{
+    margin:25px 0 12px;
+    color:#8f9ab0;
+    font-size:9px;
+    letter-spacing:.16em;
+}
+
+.control-agents-grid{
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    gap:10px;
+}
+
+.control-agent{
+    padding:13px;
+    border-radius:14px;
+    border:1px solid rgba(255,255,255,.07);
+    background:rgba(255,255,255,.02);
+    transition:.35s ease;
+}
+
+.control-agent.active{
+    transform:translateY(-4px);
+    border-color:rgba(0,229,255,.5);
+    box-shadow:0 0 22px rgba(0,229,255,.1);
+}
+
+.control-agent.done{
+    border-color:rgba(0,230,118,.45);
+}
+
+.control-agent-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.control-agent-code{
+    font-size:11px;
+    font-weight:bold;
+}
+
+.control-agent-status{
+    font-size:7px;
+    color:#68748a;
+}
+
+.control-agent small{
+    display:block;
+    margin-top:8px;
+    color:#7f8999;
+    font-size:7px;
+}
+
+.control-result-wrap{
+    margin-top:25px;
+    padding:20px;
+    border-radius:18px;
+    border:1px solid rgba(0,230,118,.25);
+    background:rgba(0,230,118,.035);
+}
+
+.control-result-title{
+    color:#00e676;
+    font-size:9px;
+    letter-spacing:.15em;
+    margin-bottom:12px;
+}
+
+#controlResult{
+    color:#dce3ef;
+    font-size:12px;
+    line-height:1.75;
+    white-space:pre-wrap;
+    max-height:220px;
+    overflow:auto;
+}
+
+#viewFullResultButton{
+    margin-top:18px;
+}
+
+@media(max-width:900px){
+    .control-room-grid{grid-template-columns:1fr}
+    .control-agents-grid{grid-template-columns:repeat(2,1fr)}
+}
+
+@media(max-width:520px){
+    .control-room-shell{padding:16px}
+    .control-room-header{flex-direction:column}
+    .orbital-system{transform:scale(.82);margin:-25px}
+    .control-agents-grid{grid-template-columns:1fr 1fr}
+}
+
+
+
+/* =================================================
+CONTROL ROOM LIVE MOTION UPGRADE
+================================================= */
+
+.control-core{
+    position:relative;
+    overflow:hidden;
+}
+
+.control-core::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:
+      linear-gradient(rgba(0,229,255,.045) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(0,229,255,.045) 1px,transparent 1px);
+    background-size:28px 28px;
+    animation:gridDrift 8s linear infinite;
+    mask-image:radial-gradient(circle,black,transparent 72%);
+}
+
+@keyframes gridDrift{
+    to{background-position:28px 28px}
+}
+
+.data-packet{
+    position:absolute;
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    background:#00e5ff;
+    box-shadow:0 0 16px #00e5ff;
+    animation:dataPacket 3.8s linear infinite;
+}
+
+.packet-1{left:8%;top:18%;animation-delay:0s}
+.packet-2{right:10%;top:35%;animation-delay:1s;background:#9c4dff;box-shadow:0 0 16px #9c4dff}
+.packet-3{left:18%;bottom:18%;animation-delay:2s;background:#00e676;box-shadow:0 0 16px #00e676}
+
+@keyframes dataPacket{
+    0%{transform:translate(0,0) scale(.5);opacity:0}
+    15%{opacity:1}
+    75%{opacity:1}
+    100%{transform:translate(180px,120px) scale(1.8);opacity:0}
+}
+
+.agent-avatar{
+    width:30px;
+    height:30px;
+    border-radius:9px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:9px;
+    font-weight:800;
+    background:rgba(255,255,255,.05);
+    border:1px solid currentColor;
+}
+
+.control-agent.active .agent-avatar{
+    animation:agentWorking 1.2s ease-in-out infinite;
+}
+
+@keyframes agentWorking{
+    0%,100%{transform:scale(1);filter:brightness(1)}
+    50%{transform:scale(1.12);filter:brightness(1.7);box-shadow:0 0 20px currentColor}
+}
+
+.agent-work-bar{
+    height:3px;
+    margin-top:11px;
+    border-radius:8px;
+    overflow:hidden;
+    background:rgba(255,255,255,.06);
+}
+
+.agent-work-bar span{
+    display:block;
+    height:100%;
+    width:0%;
+    background:currentColor;
+    transition:width .5s ease;
+}
+
+.control-agent.active .agent-work-bar span{
+    width:72%;
+    animation:workFlow 1.5s ease-in-out infinite;
+}
+
+.control-agent.done .agent-work-bar span{width:100%}
+
+@keyframes workFlow{
+    0%,100%{width:35%}
+    50%{width:88%}
+}
+
+.feed-event.important .feed-event-dot{
+    background:#00e676;
+    box-shadow:0 0 14px #00e676;
+}
+
+.control-stage-chip{
+    display:inline-flex;
+    gap:7px;
+    align-items:center;
+    margin-top:10px;
+    padding:7px 10px;
+    border-radius:999px;
+    border:1px solid rgba(0,229,255,.16);
+    color:#7f8ca2;
+    font-size:8px;
+}
+
+.thinking-dots span{
+    display:inline-block;
+    width:4px;height:4px;border-radius:50%;
+    background:#00e5ff;
+    margin:0 2px;
+    animation:thinking 1.1s infinite;
+}
+.thinking-dots span:nth-child(2){animation-delay:.18s}
+.thinking-dots span:nth-child(3){animation-delay:.36s}
+@keyframes thinking{0%,100%{opacity:.25;transform:translateY(0)}50%{opacity:1;transform:translateY(-4px)}}
+
+/* =================================================
+STRUCTURED RESULT UI
+================================================= */
+
+.result-hero{
+    padding:28px;
+    border-radius:20px;
+    border:1px solid rgba(0,230,118,.28);
+    background:
+        radial-gradient(circle at 100% 0,rgba(0,230,118,.08),transparent 34%),
+        rgba(255,255,255,.025);
+}
+
+.result-header{
+    display:flex;
+    justify-content:space-between;
+    gap:18px;
+    flex-wrap:wrap;
+    margin-bottom:22px;
+}
+
+.decision-card{
+    padding:20px;
+    border-radius:16px;
+    border:1px solid rgba(0,229,255,.18);
+    background:rgba(0,229,255,.035);
+    margin-bottom:16px;
+}
+
+.decision-label{
+    color:#00e5ff;
+    font-size:8px;
+    letter-spacing:.16em;
+    margin-bottom:9px;
+}
+
+.decision-text{
+    color:#fff;
+    font-size:16px;
+    line-height:1.5;
+    font-weight:700;
+}
+
+.result-grid{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:14px;
+}
+
+.result-section{
+    padding:18px;
+    border-radius:15px;
+    border:1px solid rgba(255,255,255,.08);
+    background:rgba(255,255,255,.018);
+}
+
+.result-section.wide{grid-column:1/-1}
+
+.result-section-title{
+    color:#9c4dff;
+    font-size:8px;
+    letter-spacing:.14em;
+    margin-bottom:10px;
+}
+
+.result-section p{
+    color:#c7cfdb;
+    font-size:12px;
+    line-height:1.75;
+    white-space:pre-wrap;
+}
+
+.result-section ul{
+    padding-left:18px;
+    color:#c7cfdb;
+    font-size:12px;
+    line-height:1.8;
+}
+
+.raw-result{
+    color:#d8e0eb;
+    font-size:13px;
+    line-height:1.85;
+    white-space:pre-wrap;
+}
+
+@media(max-width:700px){
+    .result-grid{grid-template-columns:1fr}
+    .result-section.wide{grid-column:auto}
+}
+
+
+
+/* =================================================
+ENHANCED INTERACTIVE CONTROL ROOM
+================================================= */
+
+.enhanced-control-room{
+    background:
+        radial-gradient(circle at 18% 10%,rgba(0,229,255,.08),transparent 24%),
+        radial-gradient(circle at 82% 12%,rgba(156,77,255,.12),transparent 27%),
+        linear-gradient(145deg,#070b14,#0b1020 48%,#070a12);
+    box-shadow:0 30px 100px rgba(0,0,0,.35);
+}
+
+.control-command-header{
+    padding-bottom:18px;
+    border-bottom:1px solid rgba(255,255,255,.06);
+}
+
+.eyebrow{
+    color:#00e5ff;
+    font-size:8px;
+    letter-spacing:.18em;
+    margin-bottom:8px;
+}
+
+.control-header-status{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-end;
+    gap:9px;
+}
+
+.session-id{
+    font-size:8px;
+    color:#66748b;
+    letter-spacing:.12em;
+}
+
+#sessionId{color:#9c4dff}
+
+.control-dashboard{
+    display:grid;
+    grid-template-columns:1.1fr .9fr;
+    gap:18px;
+    margin-top:22px;
+}
+
+.command-center{
+    min-height:500px;
+    position:relative;
+    overflow:hidden;
+    border-radius:24px;
+    border:1px solid rgba(0,229,255,.14);
+    background:
+      radial-gradient(circle at center,rgba(0,229,255,.08),transparent 42%),
+      #080e19;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+}
+
+.command-grid{
+    position:absolute;
+    inset:0;
+    opacity:.45;
+    background-image:
+      linear-gradient(rgba(0,229,255,.055) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(0,229,255,.055) 1px,transparent 1px);
+    background-size:26px 26px;
+    animation:gridDriftEnhanced 10s linear infinite;
+}
+
+@keyframes gridDriftEnhanced{
+    to{background-position:26px 26px}
+}
+
+.radar{
+    position:absolute;
+    border-radius:50%;
+    border:1px solid rgba(0,229,255,.16);
+    pointer-events:none;
+}
+
+.radar-one{width:390px;height:390px;animation:radarPulse 3.4s infinite}
+.radar-two{width:260px;height:260px;border-color:rgba(156,77,255,.2);animation:radarPulse 3.4s 1.4s infinite}
+
+@keyframes radarPulse{
+    0%{transform:scale(.65);opacity:.75}
+    100%{transform:scale(1.18);opacity:0}
+}
+
+.packet-4{
+    right:16%;
+    bottom:15%;
+    animation-delay:2.8s;
+    background:#ffd600;
+    box-shadow:0 0 16px #ffd600;
+}
+
+.command-center .orbital-system{z-index:2}
+
+.command-metrics{
+    position:absolute;
+    left:18px;
+    right:18px;
+    bottom:72px;
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:8px;
+    z-index:3;
+}
+
+.metric{
+    padding:10px;
+    border:1px solid rgba(255,255,255,.07);
+    border-radius:12px;
+    background:rgba(5,9,17,.68);
+    backdrop-filter:blur(8px);
+}
+
+.metric span{
+    display:block;
+    color:#637087;
+    font-size:7px;
+    letter-spacing:.12em;
+}
+
+.metric strong{
+    display:block;
+    margin-top:5px;
+    color:#e9f4ff;
+    font-size:16px;
+}
+
+.command-center .execution-meter{
+    position:absolute;
+    bottom:18px;
+    z-index:3;
+}
+
+.control-feed{
+    min-height:500px;
+    display:flex;
+    flex-direction:column;
+    background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.012));
+}
+
+.feed-clock{
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
+
+.mini-live-dot{
+    width:6px;height:6px;border-radius:50%;
+    background:#00e676;
+    box-shadow:0 0 12px #00e676;
+    animation:livePulse 1s infinite;
+}
+
+.control-feed-list{flex:1}
+
+.stream-footer{
+    display:flex;
+    justify-content:space-between;
+    padding-top:12px;
+    margin-top:10px;
+    border-top:1px solid rgba(255,255,255,.06);
+    color:#58657a;
+    font-size:7px;
+    letter-spacing:.12em;
+}
+
+#streamStatus{color:#00e5ff}
+
+.control-agents-title{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.control-agents-title small{
+    color:#657187;
+    font-size:7px;
+    letter-spacing:.12em;
+}
+
+.control-agent{
+    cursor:default;
+    position:relative;
+    overflow:hidden;
+}
+
+.control-agent::after{
+    content:"";
+    position:absolute;
+    top:0;
+    left:-120%;
+    width:70%;
+    height:100%;
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,.12),transparent);
+    transform:skewX(-20deg);
+}
+
+.control-agent.active::after{
+    animation:agentScan 1.8s linear infinite;
+}
+
+@keyframes agentScan{
+    to{left:160%}
+}
+
+.control-agent.active{
+    animation:agentCardPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes agentCardPulse{
+    0%,100%{box-shadow:0 0 14px rgba(0,229,255,.08)}
+    50%{box-shadow:0 0 34px rgba(0,229,255,.24)}
+}
+
+.enhanced-result{
+    margin-top:28px;
+    border-color:rgba(0,229,255,.22);
+    background:
+      radial-gradient(circle at 100% 0,rgba(0,229,255,.07),transparent 28%),
+      rgba(255,255,255,.02);
+}
+
+.result-live-header{
+    display:flex;
+    justify-content:space-between;
+    gap:18px;
+    align-items:flex-start;
+    padding-bottom:18px;
+    border-bottom:1px solid rgba(255,255,255,.07);
+    margin-bottom:20px;
+}
+
+.result-live-subtitle{
+    color:#78859a;
+    font-size:10px;
+    margin-top:7px;
+}
+
+.result-complete-badge{
+    padding:8px 11px;
+    border-radius:999px;
+    color:#00e676;
+    background:rgba(0,230,118,.09);
+    border:1px solid rgba(0,230,118,.2);
+    font-size:8px;
+    letter-spacing:.1em;
+    white-space:nowrap;
+}
+
+.control-result-full .result-hero{
+    background:transparent;
+    border:none;
+    padding:0;
+}
+
+.control-result-full .result-section{
+    background:rgba(255,255,255,.025);
+}
+
+.full-output-title{
+    margin-top:20px;
+    color:#00e5ff;
+    font-size:9px;
+    letter-spacing:.15em;
+}
+
+.full-output-pre{
+    margin-top:10px;
+    padding:18px;
+    border-radius:14px;
+    border:1px solid rgba(255,255,255,.07);
+    background:rgba(0,0,0,.18);
+    color:#cdd6e4;
+    font-size:12px;
+    line-height:1.8;
+    white-space:pre-wrap;
+    overflow-wrap:anywhere;
+}
+
+/* =================================================
+INTERACTIVE AGENT CARDS + MODAL
+================================================= */
+
+.agents-panel .panel-subtitle{max-width:760px}
+
+.agent-card{
+    cursor:pointer;
+    position:relative;
+    overflow:hidden;
+}
+
+.agent-card::after{
+    content:"VIEW INTELLIGENCE PROFILE →";
+    position:absolute;
+    left:16px;
+    right:16px;
+    bottom:-30px;
+    color:#00e5ff;
+    font-size:7px;
+    letter-spacing:.1em;
+    transition:.25s ease;
+}
+
+.agent-card:hover{
+    transform:translateY(-6px);
+    border-color:rgba(0,229,255,.35);
+    box-shadow:0 16px 38px rgba(0,0,0,.28);
+}
+
+.agent-card:hover::after{bottom:11px}
+.agent-card:hover .agent-role{transform:translateY(-10px)}
+
+.agent-role{transition:.25s ease}
+
+.agent-modal{
+    position:fixed;
+    inset:0;
+    z-index:9999;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+}
+
+.agent-modal.show{display:flex}
+
+.agent-modal-backdrop{
+    position:absolute;
+    inset:0;
+    background:rgba(2,5,11,.78);
+    backdrop-filter:blur(10px);
+}
+
+.agent-modal-card{
+    position:relative;
+    width:min(760px,96vw);
+    max-height:90vh;
+    overflow:auto;
+    padding:28px;
+    border-radius:24px;
+    border:1px solid rgba(0,229,255,.2);
+    background:
+      radial-gradient(circle at 100% 0,rgba(0,229,255,.08),transparent 34%),
+      #0a101c;
+    box-shadow:0 30px 100px rgba(0,0,0,.55);
+    animation:modalEnter .3s ease;
+}
+
+@keyframes modalEnter{
+    from{opacity:0;transform:translateY(20px) scale(.97)}
+    to{opacity:1;transform:translateY(0) scale(1)}
+}
+
+.agent-modal-close{
+    position:absolute;
+    top:15px;right:17px;
+    width:34px;height:34px;
+    border-radius:50%;
+    border:1px solid rgba(255,255,255,.1);
+    background:rgba(255,255,255,.04);
+    color:#fff;
+    font-size:22px;
+    cursor:pointer;
+}
+
+.agent-modal-top{
+    display:flex;
+    align-items:center;
+    gap:16px;
+    padding-bottom:22px;
+    border-bottom:1px solid rgba(255,255,255,.08);
+}
+
+.agent-modal-avatar{
+    width:70px;height:70px;
+    border-radius:18px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:800;
+    font-size:17px;
+    border:1px solid currentColor;
+    background:rgba(255,255,255,.04);
+}
+
+.agent-modal-top h2{
+    margin:0;
+    color:#fff;
+    font-size:21px;
+}
+
+.agent-modal-top p{
+    margin:7px 0 0;
+    color:#8490a5;
+    font-size:11px;
+}
+
+.agent-detail-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:13px;
+    margin-top:18px;
+}
+
+.agent-detail-block{
+    padding:16px;
+    border-radius:15px;
+    border:1px solid rgba(255,255,255,.07);
+    background:rgba(255,255,255,.02);
+}
+
+.agent-detail-block.wide{grid-column:1/-1}
+
+.detail-label{
+    color:#00e5ff;
+    font-size:8px;
+    letter-spacing:.14em;
+    margin-bottom:9px;
+}
+
+.agent-detail-block p,
+.agent-detail-block li{
+    color:#c2ccda;
+    font-size:11px;
+    line-height:1.75;
+}
+
+.agent-detail-block ul{
+    padding-left:18px;
+    margin:0;
+}
+
+@media(max-width:900px){
+    .control-dashboard{grid-template-columns:1fr}
+}
+
+@media(max-width:650px){
+    .agent-detail-grid{grid-template-columns:1fr}
+    .agent-detail-block.wide{grid-column:auto}
+    .result-live-header{flex-direction:column}
+    .control-header-status{align-items:flex-start}
+}
+
+
+to{opacity:1;transform:translateY(0)}
+
+
+
+/* =================================================
+GUARANTEED BOARDROOM OUTPUT PANEL
+This panel is rendered directly from the API response before
+any optional Control Room animation code runs.
+================================================= */
+.guaranteed-result-panel{
+    margin:20px 0;
+    padding:22px;
+    border-radius:20px;
+    border:2px solid rgba(0,229,255,.45);
+    background:
+        radial-gradient(circle at 100% 0,rgba(0,229,255,.10),transparent 32%),
+        linear-gradient(135deg,#0b1424,#09101b);
+    box-shadow:0 0 45px rgba(0,229,255,.12);
+    position:relative;
+    z-index:999;
+}
+.guaranteed-result-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:16px;
+    padding-bottom:16px;
+    margin-bottom:18px;
+    border-bottom:1px solid rgba(255,255,255,.10);
+}
+.guaranteed-result-title{
+    color:#ffffff;
+    font-size:18px;
+    font-weight:800;
+    letter-spacing:.04em;
+}
+.guaranteed-result-badge{
+    padding:8px 12px;
+    border-radius:999px;
+    color:#00e676;
+    background:rgba(0,230,118,.12);
+    border:1px solid rgba(0,230,118,.30);
+    font-size:9px;
+    font-weight:700;
+    white-space:nowrap;
+}
+.guaranteed-result-raw{
+    white-space:pre-wrap;
+    overflow-wrap:anywhere;
+    color:#e5edf7;
+    background:rgba(0,0,0,.24);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:14px;
+    padding:18px;
+    line-height:1.7;
+    font-size:12px;
+    max-height:none;
+}
+.guaranteed-result-panel.show{
+    display:block !important;
+    animation:guaranteedReveal .35s ease both;
+}
+@keyframes guaranteedReveal{
+    from{opacity:0;transform:translateY(15px)}
+    to{opacity:1;transform:translateY(0)}
+}
+
+
+/* ============================================================
+   CONTROL ROOM V2 — RESPONSIVE LIVE ORCHESTRATION
+============================================================ */
+*{box-sizing:border-box}
+body{overflow-x:hidden}
+
+.section{width:100%;max-width:100%;}
+
+.control-room-shell.enhanced-control-room{
+    width:min(100%, 1500px);
+    margin-inline:auto;
+    padding:clamp(14px,2vw,28px);
+}
+
+.control-dashboard{
+    width:100%;
+    align-items:stretch;
+}
+
+.command-center,
+.control-feed{
+    min-width:0;
+    min-height:clamp(430px,52vw,560px);
+}
+
+.control-feed{
+    overflow:hidden;
+}
+
+.control-feed-list{
+    overflow-y:auto;
+    min-height:0;
+}
+
+.live-agent-orbit{
+    position:absolute;
+    inset:0;
+    z-index:4;
+    pointer-events:none;
+}
+
+.live-agent-node{
+    --node-color:#00e5ff;
+    position:absolute;
+    width:48px;
+    height:48px;
+    border-radius:16px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:var(--node-color);
+    background:rgba(7,15,27,.9);
+    border:1px solid color-mix(in srgb,var(--node-color) 70%,transparent);
+    box-shadow:0 0 18px color-mix(in srgb,var(--node-color) 25%,transparent);
+    font-size:8px;
+    font-weight:800;
+    letter-spacing:.04em;
+    animation:nodeFloat 3.2s ease-in-out infinite;
+    transform:translate(-50%,-50%);
+}
+
+.live-agent-node::before{
+    content:"";
+    position:absolute;
+    width:7px;height:7px;
+    border-radius:50%;
+    right:-3px;top:-3px;
+    background:var(--node-color);
+    box-shadow:0 0 12px var(--node-color);
+    animation:nodeSignal 1.1s infinite;
+}
+
+.live-agent-node.analyzing{
+    animation:nodeFloat 2s ease-in-out infinite,nodeWorkGlow 1.2s ease-in-out infinite;
+}
+
+.live-agent-node.complete{
+    opacity:.65;
+    filter:saturate(.8);
+}
+
+@keyframes nodeFloat{
+    0%,100%{translate:0 0}
+    50%{translate:0 -10px}
+}
+@keyframes nodeSignal{
+    50%{transform:scale(.45);opacity:.35}
+}
+@keyframes nodeWorkGlow{
+    50%{box-shadow:0 0 34px var(--node-color),0 0 65px color-mix(in srgb,var(--node-color) 20%,transparent)}
+}
+
+.control-agent{
+    min-height:92px;
+    transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease;
+}
+
+.control-agent.active{
+    transform:translateY(-3px) scale(1.01);
+}
+
+.control-agent.active .agent-work-bar span{
+    width:75% !important;
+    animation:workTravel 1.1s linear infinite;
+}
+
+.control-agent.done .agent-work-bar span{
+    width:100% !important;
+}
+
+@keyframes workTravel{
+    0%{opacity:.35;filter:brightness(.8)}
+    50%{opacity:1;filter:brightness(1.7)}
+    100%{opacity:.35;filter:brightness(.8)}
+}
+
+.control-agent-status{
+    display:flex;
+    align-items:center;
+    gap:5px;
+    font-size:8px;
+    letter-spacing:.08em;
+}
+
+.control-agent.active .control-agent-status::before{
+    content:"●";
+    animation:statusBlink .8s infinite;
+}
+@keyframes statusBlink{50%{opacity:.25}}
+
+.control-result-immediate{
+    margin:20px 0 22px;
+    padding:clamp(18px,2.4vw,28px);
+    width:100%;
+    border-radius:22px;
+    border:2px solid rgba(0,229,255,.5);
+    background:
+        radial-gradient(circle at 100% 0,rgba(0,229,255,.14),transparent 35%),
+        linear-gradient(135deg,#071521,#0b0f20);
+    box-shadow:0 0 55px rgba(0,229,255,.14);
+    position:relative;
+    z-index:100;
+}
+
+.immediate-result-top{
+    display:flex;
+    justify-content:space-between;
+    gap:18px;
+    align-items:flex-start;
+    padding-bottom:17px;
+    margin-bottom:17px;
+    border-bottom:1px solid rgba(255,255,255,.12);
+}
+
+.immediate-result-title{
+    color:#fff;
+    font-size:clamp(17px,2vw,24px);
+    font-weight:850;
+    letter-spacing:.04em;
+}
+
+.immediate-result-status{
+    padding:9px 12px;
+    border-radius:999px;
+    color:#00e676;
+    border:1px solid rgba(0,230,118,.35);
+    background:rgba(0,230,118,.1);
+    font-size:9px;
+    font-weight:800;
+    white-space:nowrap;
+}
+
+.immediate-output{
+    white-space:pre-wrap;
+    overflow-wrap:anywhere;
+    word-break:break-word;
+    color:#e8f0fa;
+    font-size:clamp(12px,1.2vw,15px);
+    line-height:1.8;
+    padding:18px;
+    border-radius:14px;
+    background:rgba(0,0,0,.24);
+    border:1px solid rgba(255,255,255,.09);
+}
+
+@media(max-width:1000px){
+    .control-dashboard{grid-template-columns:1fr}
+    .command-center,.control-feed{min-height:430px}
+}
+
+@media(max-width:650px){
+    .control-room-header{gap:14px}
+    .control-header-status{align-items:flex-start}
+    .command-center{min-height:500px}
+    .command-metrics{bottom:76px;left:10px;right:10px}
+    .metric{padding:8px}
+    .metric strong{font-size:14px}
+    .live-agent-node{width:38px;height:38px;border-radius:12px;font-size:7px}
+    .immediate-result-top{flex-direction:column}
+    .immediate-result-status{white-space:normal}
+}
+
+
+
+/* =====================================================
+   FINAL EXECUTIVE RESULTS PAGE
+   Separate page — balanced, professional and readable
+===================================================== */
+
+#resultsPage{min-height:100vh;}
+
+.results-page-shell{
+    width:100%;
+    max-width:1180px;
+    margin:0 auto;
+    padding:34px;
+    border-radius:22px;
+    border:1px solid rgba(255,255,255,.08);
+    background:
+        radial-gradient(circle at 88% 0%,rgba(0,229,255,.07),transparent 28%),
+        radial-gradient(circle at 8% 12%,rgba(156,77,255,.06),transparent 25%),
+        linear-gradient(145deg,#080e19,#0c1322 58%,#090f19);
+    box-shadow:0 24px 80px rgba(0,0,0,.30);
+}
+
+.results-page-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:24px;
+    padding-bottom:24px;
+    margin-bottom:18px;
+    border-bottom:1px solid rgba(255,255,255,.08);
+}
+
+.results-eyebrow{
+    color:#00e5ff;
+    font-size:10px;
+    font-weight:700;
+    letter-spacing:.14em;
+    margin-bottom:8px;
+}
+
+.results-main-title{
+    margin:0;
+    font-size:30px;
+    line-height:1.2;
+    letter-spacing:-.02em;
+    color:#f7f9fc;
+}
+
+.results-description{
+    max-width:680px;
+    margin:10px 0 0;
+    color:#8f9bad;
+    font-size:14px;
+    line-height:1.65;
+}
+
+.results-header-actions{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-end;
+    gap:9px;
+}
+
+.result-status-badge{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    padding:8px 12px;
+    border-radius:999px;
+    color:#35e89a;
+    font-size:10px;
+    font-weight:700;
+    letter-spacing:.08em;
+    background:rgba(0,230,118,.07);
+    border:1px solid rgba(0,230,118,.22);
+}
+
+.result-status-badge span{
+    width:6px;height:6px;border-radius:50%;
+    background:#00e676;box-shadow:0 0 10px rgba(0,230,118,.8);
+}
+
+.results-back-btn{
+    padding:8px 12px;
+    border-radius:9px;
+    border:1px solid rgba(255,255,255,.12);
+    background:rgba(255,255,255,.035);
+    color:#b9c4d2;
+    font-size:11px;
+    cursor:pointer;
+    transition:.2s ease;
+}
+.results-back-btn:hover{background:rgba(255,255,255,.08);color:#fff;}
+
+/* Final recommendation — only the decision, never the whole raw response */
+.final-decision-card{
+    padding:26px 28px;
+    margin-bottom:14px;
+    border-radius:16px;
+    background:
+        radial-gradient(circle at 100% 0,rgba(0,230,118,.10),transparent 34%),
+        linear-gradient(135deg,rgba(0,230,118,.055),rgba(0,229,255,.025));
+    border:1px solid rgba(0,230,118,.26);
+}
+
+.final-decision-label{
+    color:#32e49a;
+    font-size:10px;
+    font-weight:700;
+    letter-spacing:.13em;
+    margin-bottom:10px;
+}
+
+.final-decision-text{
+    color:#f3f7fa;
+    font-size:19px;
+    font-weight:650;
+    line-height:1.5;
+    white-space:pre-wrap;
+    overflow-wrap:anywhere;
+}
+
+/* Structured report */
+.premium-result-grid{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:14px;
+}
+
+.premium-result-card{
+    padding:20px;
+    border-radius:14px;
+    background:rgba(255,255,255,.022);
+    border:1px solid rgba(255,255,255,.085);
+}
+
+.premium-result-card.wide{grid-column:1 / -1;}
+
+.premium-result-title{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    color:#2bdcf1;
+    font-size:10px;
+    font-weight:750;
+    letter-spacing:.11em;
+    margin-bottom:12px;
+}
+.premium-result-title::before{
+    content:"";width:5px;height:5px;border-radius:50%;
+    background:#00e5ff;box-shadow:0 0 9px rgba(0,229,255,.7);
+}
+
+.premium-result-text{
+    color:#bdc7d4;
+    font-size:14px;
+    line-height:1.7;
+    overflow-wrap:anywhere;
+}
+.premium-result-text p{margin:0;}
+.premium-result-text ul,.premium-result-text ol{
+    margin:0;padding-left:18px;color:#bdc7d4;font-size:14px;line-height:1.7;
+}
+.premium-result-text li{margin:5px 0;}
+
+/* Executive synthesis */
+.executive-synthesis-card{
+    margin-top:14px;
+    padding:20px;
+    border-radius:14px;
+    background:rgba(255,255,255,.022);
+    border:1px solid rgba(255,255,255,.085);
+}
+
+/* Executive reports */
+.executive-reports-title{
+    margin:26px 0 12px;
+    color:#f4f7fb;
+    font-size:17px;
+    font-weight:650;
+}
+
+.executive-report-card{
+    padding:18px 20px;
+    margin-top:10px;
+    border-radius:13px;
+    background:rgba(255,255,255,.018);
+    border:1px solid rgba(255,255,255,.075);
+}
+
+.executive-report-name{
+    color:#ad7aff;
+    font-size:11px;
+    font-weight:750;
+    letter-spacing:.07em;
+    margin-bottom:9px;
+}
+
+.executive-report-text{
+    color:#b8c3d0;
+    font-size:14px;
+    line-height:1.7;
+    white-space:pre-wrap;
+    overflow-wrap:anywhere;
+}
+
+/* Raw response stays secondary */
+.result-raw-details{
+    margin-top:18px;
+    padding:14px 16px;
+    border-radius:12px;
+    background:rgba(0,0,0,.12);
+    border:1px solid rgba(255,255,255,.06);
+}
+.result-raw-details summary{
+    cursor:pointer;color:#7f8c9e;font-size:11px;font-weight:600;
+}
+.result-raw-output{
+    margin-top:12px;padding:14px;border-radius:9px;
+    background:rgba(0,0,0,.24);color:#aeb9c7;
+    font-size:12px;line-height:1.6;white-space:pre-wrap;overflow:auto;
+}
+
+
+
+/* =====================================================
+   CLEAN EXECUTIVE CONTRIBUTIONS & SYNTHESIS
+===================================================== */
+.executive-contributions-section,.synthesis-section{
+    margin-top:28px;
+    padding-top:4px;
+}
+.executive-section-heading{margin-bottom:14px;}
+.section-kicker{
+    color:#2bdcf1;font-size:10px;font-weight:750;letter-spacing:.12em;margin-bottom:7px;
+}
+.executive-section-heading h2{
+    margin:0;color:#f2f6fb;font-size:20px;line-height:1.25;font-weight:700;
+}
+.executive-section-heading p{
+    margin:7px 0 0;color:#8f9caf;font-size:13px;line-height:1.65;max-width:760px;
+}
+.agent-contribution-grid{
+    display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;
+}
+.agent-contribution-card{
+    padding:18px;border-radius:14px;background:rgba(255,255,255,.022);
+    border:1px solid rgba(255,255,255,.085);
+}
+.agent-card-top{display:flex;align-items:center;gap:11px;margin-bottom:14px;}
+.agent-code{
+    width:42px;height:42px;display:grid;place-items:center;border-radius:11px;
+    color:#40e7f6;background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.18);
+    font-size:11px;font-weight:800;letter-spacing:.04em;
+}
+.agent-full-name{color:#eef4fa;font-size:14px;font-weight:700;}
+.agent-role{color:#8592a4;font-size:12px;margin-top:3px;}
+.agent-focus{
+    padding:10px 11px;margin-bottom:14px;border-radius:9px;background:rgba(0,0,0,.13);
+    color:#9eabba;font-size:12px;line-height:1.55;
+}
+.agent-focus span{display:block;color:#2bdcf1;font-size:9px;font-weight:750;letter-spacing:.1em;margin-bottom:3px;}
+.agent-view-label{color:#ad7aff;font-size:9px;font-weight:750;letter-spacing:.1em;margin-bottom:7px;}
+.agent-view{color:#c0cad7;font-size:14px;line-height:1.72;}
+.agent-view p{margin:0 0 8px;}.agent-view p:last-child{margin-bottom:0;}
+.agent-view ul{margin:0;padding-left:18px;}.agent-view li{margin:4px 0;}
+.synthesis-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;}
+.synthesis-item{
+    padding:18px;border-radius:14px;background:rgba(255,255,255,.022);
+    border:1px solid rgba(255,255,255,.085);
+}
+.synthesis-item:first-child{grid-column:1 / -1;}
+.synthesis-label{color:#2bdcf1;font-size:10px;font-weight:750;letter-spacing:.11em;margin-bottom:9px;}
+.synthesis-content{color:#bdc7d4;font-size:14px;line-height:1.7;}
+.synthesis-content p{margin:0 0 8px;}.synthesis-content p:last-child{margin-bottom:0;}
+.synthesis-content ul{margin:0;padding-left:18px;}.synthesis-content li{margin:5px 0;}
+@media(max-width:760px){
+    .agent-contribution-grid,.synthesis-grid{grid-template-columns:1fr;}
+    .synthesis-item:first-child{grid-column:auto;}
+}
+
+@media(max-width:900px){
+    .results-page-shell{padding:26px;}
+    .results-page-header{flex-direction:column;}
+    .results-header-actions{align-items:flex-start;flex-direction:row;}
+}
+@media(max-width:650px){
+    .results-page-shell{padding:18px;border-radius:16px;}
+    .results-main-title{font-size:26px;}
+    .results-description{font-size:13px;}
+    .premium-result-grid{grid-template-columns:1fr;}
+    .premium-result-card.wide{grid-column:auto;}
+    .final-decision-card{padding:20px;}
+    .final-decision-text{font-size:17px;}
+    .results-header-actions{align-items:flex-start;flex-direction:column;}
+}
+
+
+
+/* ============================================================
+   FINAL FIX — AGENT MODAL + LIVE AGENT ORBIT
+   Only fixes the two issues requested
+============================================================ */
+
+/* Keep the live agent area inside the visual stage and away from
+   the bottom metrics / execution meter. */
+.live-agent-orbit{
+    top:22px;
+    right:34px;
+    bottom:126px;
+    left:34px;
+    z-index:8;
+    overflow:visible;
+}
+
+.live-agent-node{
+    width:54px;
+    height:54px;
+    min-width:54px;
+    border-radius:17px;
+    font-size:9px;
+    line-height:1;
+    white-space:nowrap;
+    z-index:9;
+    pointer-events:none;
+}
+
+/* Central decision core always remains visually separate. */
+.command-center .orbital-system{
+    z-index:3;
+}
+
+.command-center .control-core-center{
+    z-index:5;
+}
+
+/* Modal must always sit above the whole application. */
+.agent-modal{
+    z-index:2147483647;
+}
+
+.agent-modal.show{
+    display:flex !important;
+}
+
+.agent-modal-close{
+    z-index:20;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    line-height:1;
+}
+
+.agent-modal-close:hover{
+    background:rgba(255,255,255,.11);
+    border-color:rgba(0,229,255,.45);
+}
+
+@media(max-width:650px){
+    .live-agent-orbit{
+        top:16px;
+        right:18px;
+        bottom:118px;
+        left:18px;
+    }
+
+    .live-agent-node{
+        width:42px;
+        height:42px;
+        min-width:42px;
+        border-radius:13px;
+        font-size:7px;
+    }
+}
+</style>
+</head>
+
+
+<body>
+
+<div class="activation-overlay" id="activationOverlay">
+
+    <div class="activation-text">
+
+        EXECUTIVE INTELLIGENCE ACTIVATING
+
+        <span>◈</span>
+
+    </div>
+
+</div>
+
+
+<div class="app">
+
+
+<!-- ================= SIDEBAR ================= -->
+
+<aside class="sidebar">
+
+    <div class="brand">
+
+        <div class="brand-logo">◈</div>
+
+        <div>
+
+            <h2>AI BOARDROOM</h2>
+
+            <p>EXECUTIVE INTELLIGENCE</p>
+
+        </div>
+
+    </div>
+
+
+    <div class="nav-label">
+        WORKSPACE
+    </div>
+
+
+    <div class="nav">
+
+        <button class="nav-item active"
+        data-section="overview">
+
+            <span class="nav-icon">◉</span>
+            Overview
+
+        </button>
+
+
+        <button class="nav-item"
+        data-section="ask">
+
+            <span class="nav-icon">✦</span>
+            Ask Boardroom
+
+        </button>
+
+
+        <button class="nav-item"
+        data-section="agents">
+
+            <span class="nav-icon">◈</span>
+            AI Agents
+
+        </button>
+
+
+    <div class="sidebar-bottom">
+
+        <div class="system-card">
+
+            <div class="status">
+
+                <span class="status-dot"></span>
+
+                BOARDROOM ONLINE
+
+            </div>
+
+            <p>
+                10 EXECUTIVE AGENTS READY
+            </p>
+
+        </div>
+
+    </div>
+
+</aside>
+
+
+
+<!-- ================= MAIN ================= -->
+
+<main class="main">
+
+
+<header class="topbar">
+
+    <div>
+
+        <div class="breadcrumb">
+            AI BOARDROOM / EXECUTIVE WORKSPACE
+        </div>
+
+        <h1 class="page-title"
+        id="pageTitle">
+
+            Overview
+
+        </h1>
+
+    </div>
+
+
+    <div class="top-actions">
+
+        <button class="top-button">🔔</button>
+
+        <div class="workspace-status">
+
+            ● BOARDROOM ONLINE
+
+        </div>
+
+    </div>
+
+</header>
+
+
+
+<div class="content">
+
+
+<!-- =================================================
+OVERVIEW
+================================================= -->
+
+<section class="section active"
+id="overview">
+
+
+<div class="hero"
+id="hero">
+
+
+<div class="hero-text">
+
+    <div class="hero-tag">
+
+        MULTI-AGENT EXECUTIVE INTELLIGENCE
+
+    </div>
+
+
+    <h1>
+
+        Decisions become better
+
+        <br>
+
+        when <span>every perspective thinks.</span>
+
+    </h1>
+
+
+    <p>
+
+        Bring together Finance, Technology,
+        Marketing, Operations, Strategy, Risk,
+        Legal and People Intelligence into one
+        collaborative AI Boardroom.
+
+    </p>
+
+
+    <div class="hero-buttons">
+
+        <button class="primary-btn"
+        onclick="showSection('ask')">
+
+            ENTER BOARDROOM →
+
+        </button>
+
+
+        <button class="secondary-btn"
+        onclick="showSection('agents')">
+
+            MEET THE AGENTS
+
+        </button>
+
+    </div>
+
+</div>
+
+
+
+<!-- =================================================
+AGENT DECK
+================================================= -->
+
+<div class="deck-zone"
+id="deckZone">
+
+
+<div class="deck-core">
+
+    <div class="core-symbol">
+        ◈
+    </div>
+
+    <h3>AI BOARDROOM</h3>
+
+    <p>COLLECTIVE INTELLIGENCE</p>
+
+</div>
+
+
+<div class="agent-info"
+id="agentInfo">
+
+    <small>
+        EXECUTIVE AGENT
+    </small>
+
+    <h3 id="infoName">
+        SELECT AN AGENT
+    </h3>
+
+    <p id="infoText">
+
+        Select any executive to explore
+        its intelligence domain.
+
+    </p>
+
+</div>
+
+
+<!-- CARDS GENERATED BY JAVASCRIPT -->
+
+</div>
+
+</div>
+
+
+
+<!-- STATS -->
+
+<div class="stats-grid">
+
+    <div class="stat-card">
+
+        <div class="stat-label">
+            EXECUTIVE AGENTS
+        </div>
+
+        <div class="stat-value">
+            10
+        </div>
+
+        <div class="stat-status">
+            ALL SYSTEMS READY
+        </div>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <div class="stat-label">
+            BOARDROOM STATUS
+        </div>
+
+        <div class="stat-value">
+            LIVE
+        </div>
+
+        <div class="stat-status">
+            COLLECTIVE INTELLIGENCE
+        </div>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <div class="stat-label">
+            ANALYSES
+        </div>
+
+        <div class="stat-value"
+        id="analysisCount">
+
+            0
+
+        </div>
+
+        <div class="stat-status">
+            CURRENT SESSION
+        </div>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <div class="stat-label">
+            DECISION ENGINE
+        </div>
+
+        <div class="stat-value">
+            READY
+        </div>
+
+        <div class="stat-status">
+            WAITING FOR INPUT
+        </div>
+
+    </div>
+
+</div>
+
+
+<div class="panel">
+
+    <div class="panel-title">
+        EXECUTIVE INTELLIGENCE TEAM
+    </div>
+
+    <div class="panel-subtitle">
+        Ten specialized perspectives.
+        One collective decision.
+    </div>
+
+    <div class="agent-grid"
+    id="overviewAgents"></div>
+
+</div>
+
+
+</section>
+
+
+
+<!-- =================================================
+ASK
+================================================= -->
+
+<section class="section"
+id="ask">
+
+
+<div class="panel">
+
+<div class="panel-title">
+    01 — SELECT INPUT TYPE
+</div>
+
+<div class="panel-subtitle">
+    Choose how you want to interact
+    with the Boardroom.
+</div>
+
+
+<div class="mode-grid"
+style="margin-top:22px">
+
+
+<div class="mode-card selected"
+data-input="question">
+
+    <div class="mode-icon">💬</div>
+
+    <h3>Question</h3>
+
+    <p>
+        Ask your AI executives
+        a business question.
+    </p>
+
+</div>
+
+
+<div class="mode-card"
+data-input="question-document">
+
+    <div class="mode-icon">📎</div>
+
+    <h3>Question + Document</h3>
+
+    <p>
+        Add business context
+        through a document.
+    </p>
+
+</div>
+
+
+<div class="mode-card"
+data-input="document">
+
+    <div class="mode-icon">📄</div>
+
+    <h3>Document Analysis</h3>
+
+    <p>
+        Let the Boardroom
+        analyze your document.
+    </p>
+
+</div>
+
+</div>
+
+
+<textarea
+id="questionInput"
+placeholder="Describe your business challenge..."></textarea>
+
+<div id="documentUploadArea" style="margin-top:15px;display:none">
+    <label style="
+        display:block;
+        padding:16px;
+        border:1px dashed rgba(255,255,255,.22);
+        border-radius:14px;
+        cursor:pointer;
+        color:#aaa;
+        font-size:10px;
+        letter-spacing:.08em">
+        📎 SELECT DOCUMENT
+        <input
+            id="documentInput"
+            type="file"
+            accept=".pdf,.docx,.pptx,.txt"
+            style="display:none">
+    </label>
+
+    <div
+        id="selectedDocumentName"
+        style="margin-top:8px;color:#00e676;font-size:9px">
+    </div>
+</div>
+
+
+</div>
+
+
+
+<div class="panel">
+
+    <div class="panel-title">
+        02 — RESPONSE DEPTH
+    </div>
+
+
+    <div class="option-grid"
+    style="margin-top:20px">
+
+
+        <div class="option"
+        data-response="Short Insight">
+
+            SHORT INSIGHT
+
+        </div>
+
+
+        <div class="option"
+        data-response="Executive Summary">
+
+            EXECUTIVE SUMMARY
+
+        </div>
+
+
+        <div class="option selected"
+        data-response="Detailed Analysis">
+
+            DETAILED ANALYSIS
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<div class="panel">
+
+    <div class="panel-title">
+        03 — INTELLIGENCE MODE
+    </div>
+
+
+    <div class="board-mode"
+    style="margin-top:20px">
+
+
+        <div class="board-option selected"
+        data-board="Fast Intelligence">
+
+            <h3>⚡ Fast Intelligence</h3>
+
+            <p>
+                Relevant executives
+                provide rapid insights.
+            </p>
+
+        </div>
+
+
+        <div class="board-option"
+        data-board="Deep Boardroom Analysis">
+
+            <h3>🎯 Deep Boardroom Analysis</h3>
+
+            <p>
+                Full collaboration between
+                all executive agents.
+            </p>
+
+        </div>
+
+    </div>
+
+
+</div>
+
+
+<div class="panel">
+
+    <div class="panel-title">
+        04 — EXECUTIVE AGENT SELECTION
+    </div>
+
+    <div class="panel-subtitle">
+        Choose automatic AI selection or manually select the executives who should analyze your challenge.
+    </div>
+
+    <div class="board-mode" style="margin-top:20px">
+
+        <div class="board-option selected" id="autoAgentsOption" data-agent-mode="auto">
+            <h3>🤖 Auto Agents</h3>
+            <p>AI automatically selects the most relevant executives for your question.</p>
+        </div>
+
+        <div class="board-option" id="manualAgentsOption" data-agent-mode="manual">
+            <h3>👤 Manual Agents</h3>
+            <p>You choose exactly which executive agents participate.</p>
+        </div>
+
+    </div>
+
+    <div id="manualAgentsPanel" style="display:none;margin-top:22px">
+
+        <div class="panel-subtitle" style="margin-bottom:14px">
+            SELECT EXECUTIVE AGENTS
+        </div>
+
+        <div id="manualAgentsGrid" class="option-grid" style="grid-template-columns:repeat(2,minmax(0,1fr));gap:10px"></div>
+
+        <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
+            <button type="button" class="secondary-btn" id="selectAllAgents">SELECT ALL</button>
+            <button type="button" class="secondary-btn" id="clearAllAgents">CLEAR ALL</button>
+        </div>
+
+    </div>
+
+
+    <div class="button-area">
+
+        <button class="primary-btn"
+        id="activateButton">
+
+            ACTIVATE BOARDROOM →
+
+        </button>
+
+    </div>
+
+</div>
+
+
+</section>
+
+
+
+<!-- =================================================
+AGENTS
+================================================= -->
+
+
+<section class="section"
+id="agents">
+
+<div class="panel agents-panel">
+
+    <div class="panel-title">
+        THE EXECUTIVE BOARD
+    </div>
+
+    <div class="panel-subtitle">
+        Click any executive card to explore responsibilities, expertise, decision lens and when the Boardroom uses that agent.
+    </div>
+
+    <div class="agent-grid"
+    id="allAgents"></div>
+
+</div>
+
+</section>
+
+
+<!-- =================================================
+AI CONTROL ROOM
+================================================= -->
+
+
+<section class="section" id="controlRoom">
+
+<div class="control-room-shell enhanced-control-room">
+
+    <div class="control-room-header control-command-header">
+        <div>
+            <div class="eyebrow">◈ LIVE MULTI-AGENT ORCHESTRATION</div>
+            <div class="panel-title">AI CONTROL ROOM</div>
+            <div class="panel-subtitle">
+                Watch the executive network think, coordinate and deliver a complete CEO-level decision.
+            </div>
+        </div>
+
+        <div class="control-header-status">
+            <div class="control-live">
+                <span class="live-dot"></span>
+                LIVE EXECUTION
+            </div>
+            <div class="session-id">SESSION <span id="sessionId">READY</span></div>
+        </div>
+    </div>
+<div class="control-dashboard">
+
+        <div class="command-center">
+
+            <div class="command-grid"></div>
+
+            <div class="radar radar-one"></div>
+            <div class="radar radar-two"></div>
+
+            <div class="data-packet packet-1"></div>
+            <div class="data-packet packet-2"></div>
+            <div class="data-packet packet-3"></div>
+            <div class="data-packet packet-4"></div>
+
+            <div id="liveAgentOrbit" class="live-agent-orbit" aria-hidden="true"></div>
+
+            <div class="orbital-system">
+                <div class="orbit orbit-one"></div>
+                <div class="orbit orbit-two"></div>
+                <div class="orbit orbit-three"></div>
+
+                <div class="control-core-center">
+                    <div class="core-pulse"></div>
+                    <div class="core-symbol">◈</div>
+                    <div id="controlStage">INITIALIZING</div>
+                    <small id="controlStageDetail">Preparing executive network</small>
+                    <div class="thinking-dots" id="thinkingDots">
+                        <span></span><span></span><span></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="command-metrics">
+                <div class="metric">
+                    <span>AGENTS</span>
+                    <strong id="metricAgents">0</strong>
+                </div>
+                <div class="metric">
+                    <span>ACTIVE</span>
+                    <strong id="metricActive">0</strong>
+                </div>
+                <div class="metric">
+                    <span>PACKETS</span>
+                    <strong id="metricPackets">0</strong>
+                </div>
+            </div>
+
+            <div class="execution-meter">
+                <div class="execution-meter-top">
+                    <span>BOARDROOM EXECUTION</span>
+                    <strong id="executionPercent">0%</strong>
+                </div>
+                <div class="execution-track">
+                    <div id="executionBar"></div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="control-feed">
+
+            <div class="feed-title">
+                <span>LIVE ACTIVITY STREAM</span>
+                <div class="feed-clock">
+                    <span class="mini-live-dot"></span>
+                    <span id="controlTimer">00:00</span>
+                </div>
+            </div>
+
+            <div id="controlFeed" class="control-feed-list"></div>
+
+            <div class="stream-footer">
+                <span>◌ EVENT STREAM</span>
+                <span id="streamStatus">WAITING FOR COMMAND</span>
+            </div>
+
+        </div>
+
+    </div>
+<div class="control-agents-title">
+        <span>EXECUTIVE NETWORK</span>
+        <small>LIVE AGENT STATUS</small>
+    </div>
+
+    <div id="controlAgents" class="control-agents-grid"></div>
+
+    <div class="control-result-wrap enhanced-result" id="controlResultWrap" style="display:none">
+
+        <div class="result-live-header">
+            <div>
+                <div class="control-result-title">◈ COMPLETE BOARDROOM RESULT</div>
+                <div class="result-live-subtitle">
+                    Complete CEO decision, executive intelligence and recommendations.
+                </div>
+            </div>
+
+            <div class="result-complete-badge">EXECUTION COMPLETE ✓</div>
+        </div>
+
+        <div id="controlResult"></div>
+
+    </div>
+
+</div>
+
+</section>
+
+<!-- =================================================
+FINAL EXECUTIVE RESULTS
+================================================= -->
+
+<section class="section" id="resultsPage">
+
+    <div class="results-page-shell">
+
+        <div class="results-page-header">
+
+            <div>
+                <div class="results-eyebrow">◈ AI BOARDROOM • FINAL INTELLIGENCE REPORT</div>
+
+                <h1 class="results-main-title">Executive Decision</h1>
+
+                <p class="results-description">
+                    Your AI Boardroom has completed its analysis and consolidated all executive intelligence into a clear, structured strategic decision.
+                </p>
+            </div>
+
+            <div class="results-header-actions">
+                <div class="result-status-badge">
+                    <span></span>
+                    ANALYSIS COMPLETE
+                </div>
+
+                <button class="results-back-btn" type="button" onclick="showSection('controlRoom')">
+                    ← Back to Control Room
+                </button>
+            </div>
+
+        </div>
+
+        <div id="resultsPageContent"></div>
+
+    </div>
+
+</section>
+
+
+<!-- =================================================
+ANALYSIS
+================================================= -->
+
+<section class="section"
+id="analysis">
+
+<div class="panel">
+
+    <div class="panel-title">
+        LIVE BOARDROOM ANALYSIS
+    </div>
+
+    <div class="panel-subtitle"
+    id="analysisQuestion">
+
+        Activate the Boardroom
+        to begin.
+
+    </div>
+
+    <div id="progressList"></div>
+
+</div>
+
+
+<div class="panel">
+
+    <div class="panel-title">
+        BOARDROOM OUTPUT
+    </div>
+
+    <div id="analysisOutput"
+    style="
+    margin-top:20px;
+    color:#999;
+    line-height:1.8">
+
+        Your AI Boardroom output
+        will appear here.
+
+    </div>
+
+</div>
+
+</section>
+
+
+
+
+</div>
+
+</main>
+
+</div>
+
+
+
+<script>
+
+/* =====================================================
+   AI CONTROL ROOM
+===================================================== */
+
+let controlTimerInterval=null;
+let controlStartedAt=null;
+let controlActiveAgents=[];
+
+function controlTime(){
+    if(!controlStartedAt) return "00:00";
+    const seconds=Math.floor((Date.now()-controlStartedAt)/1000);
+    return String(Math.floor(seconds/60)).padStart(2,"0")+":"+
+           String(seconds%60).padStart(2,"0");
+}
+
+function startControlTimer(){
+    stopControlTimer();
+    controlStartedAt=Date.now();
+    document.getElementById("controlTimer").textContent="00:00";
+    controlTimerInterval=setInterval(()=>{
+        document.getElementById("controlTimer").textContent=controlTime();
+    },1000);
+}
+
+function stopControlTimer(){
+    if(controlTimerInterval){
+        clearInterval(controlTimerInterval);
+        controlTimerInterval=null;
+    }
+}
+
+function addControlFeed(message,important=false){
+
+    const feed=document.getElementById("controlFeed");
+    const event=document.createElement("div");
+
+    event.className="feed-event"+(important?" important":"");
+
+    event.innerHTML=`
+        <div class="feed-event-dot"></div>
+        <div class="feed-event-time">${controlTime()}</div>
+        <div class="feed-event-text">${escapeHtml(message)}</div>
+    `;
+
+    feed.appendChild(event);
+    feed.scrollTop=feed.scrollHeight;
+
+    const packetMetric=document.getElementById("metricPackets");
+    if(packetMetric){
+        packetMetric.textContent=String(Number(packetMetric.textContent||0)+1);
+    }
+}
+function setControlStage(stage,detail,percent){
+    document.getElementById("controlStage").textContent=stage;
+    document.getElementById("controlStageDetail").textContent=detail;
+    document.getElementById("executionPercent").textContent=Math.min(100,Math.max(0,percent))+"%";
+    document.getElementById("executionBar").style.width=Math.min(100,Math.max(0,percent))+"%";
+}
+
+
+let controlLiveLoop=null;
+let controlVisualTick=0;
+
+function renderLiveAgentOrbit(activeAgents){
+    const orbit=document.getElementById("liveAgentOrbit");
+    if(!orbit) return;
+
+    const visibleAgents=activeAgents.slice(0,8);
+    const count=visibleAgents.length;
+
+    if(!count){
+        orbit.innerHTML="";
+        return;
+    }
+
+    /*
+       Dynamic safe orbit:
+       - 1 agent: top centre
+       - 2 agents: left / right (never over the centre core)
+       - 3+ agents: evenly distributed around the core
+       The orbit container itself is limited above the bottom metrics.
+    */
+    const startAngle = count===1
+        ? -Math.PI/2
+        : count===2
+            ? 0
+            : -Math.PI/2;
+
+    const radiusX = count<=2 ? 38 : 36;
+    const radiusY = count<=2 ? 24 : 30;
+
+    orbit.innerHTML=visibleAgents.map((agent,index)=>{
+        const angle = count===1
+            ? startAngle
+            : startAngle + (Math.PI*2*index/count);
+
+        const x=50+Math.cos(angle)*radiusX;
+        const y=50+Math.sin(angle)*radiusY;
+
+        return `<div class="live-agent-node" id="orbitAgent-${agent.code}"
+            style="--node-color:${agent.color};left:${x}%;top:${y}%">${agent.code}</div>`;
+    }).join("");
+}
+
+function renderControlAgents(activeAgents){
+    controlActiveAgents=activeAgents;
+    renderLiveAgentOrbit(activeAgents);
+
+    const grid=document.getElementById("controlAgents");
+    if(!grid) return;
+
+    grid.innerHTML=activeAgents.map(agent=>`
+        <div class="control-agent" id="controlAgent-${agent.code}" style="color:${agent.color}">
+            <div class="control-agent-top">
+                <div style="display:flex;align-items:center;gap:9px">
+                    <div class="agent-avatar">${agent.code}</div>
+                    <div>
+                        <div class="control-agent-code">${agent.code}</div>
+                        <small style="margin-top:3px">${agent.role}</small>
+                    </div>
+                </div>
+                <div class="control-agent-status">WAITING</div>
+            </div>
+            <div class="agent-work-bar"><span></span></div>
+        </div>
+    `).join("");
+}
+
+function setControlAgentState(code,state){
+    const card=document.getElementById(`controlAgent-${code}`);
+    const node=document.getElementById(`orbitAgent-${code}`);
+
+    if(card){
+        const status=card.querySelector(".control-agent-status");
+        card.classList.remove("active","done");
+
+        if(state==="analyzing"){
+            card.classList.add("active");
+            status.textContent="WORKING";
+            status.style.color="#00e5ff";
+        }else if(state==="complete"){
+            card.classList.add("done");
+            status.textContent="COMPLETE ✓";
+            status.style.color="#00e676";
+        }else{
+            status.textContent="WAITING";
+            status.style.color="#68748a";
+        }
+    }
+
+    if(node){
+        node.classList.remove("analyzing","complete");
+        if(state==="analyzing") node.classList.add("analyzing");
+        if(state==="complete") node.classList.add("complete");
+    }
+
+    const activeCount=[...document.querySelectorAll(".control-agent.active")].length;
+    const activeMetric=document.getElementById("metricActive");
+    if(activeMetric) activeMetric.textContent=activeCount;
+}
+
+function stopControlVisualLoop(){
+    if(controlLiveLoop){
+        clearInterval(controlLiveLoop);
+        controlLiveLoop=null;
+    }
+}
+
+function startControlVisualLoop(activeAgents){
+    stopControlVisualLoop();
+    if(!activeAgents.length) return;
+
+    const actions=[
+        "reviewing the business context",
+        "testing assumptions",
+        "checking risks and opportunities",
+        "building an executive recommendation",
+        "cross-checking evidence"
+    ];
+
+    let i=0;
+    controlLiveLoop=setInterval(()=>{
+        if(!controlActiveAgents.length) return;
+
+        const current=controlActiveAgents[i % controlActiveAgents.length];
+        const previous=controlActiveAgents[(i-1+controlActiveAgents.length)%controlActiveAgents.length];
+
+        if(previous && previous.code!==current.code){
+            setControlAgentState(previous.code,"waiting");
+        }
+
+        setControlAgentState(current.code,"analyzing");
+
+        const pct=Math.min(92,35+(controlVisualTick%12)*4);
+        setControlStage("ANALYZING",`${current.code} is ${actions[controlVisualTick%actions.length]}`,pct);
+        addControlFeed(`${current.code} is working: ${actions[controlVisualTick%actions.length]}.`);
+
+        i++;
+        controlVisualTick++;
+    },1800);
+}
+
+function openControlRoom(activeAgents){
+    showSection("controlRoom");
+
+    const feed=document.getElementById("controlFeed");
+    if(feed) feed.innerHTML="";
+
+    const resultWrap=document.getElementById("controlResultWrap");
+    if(resultWrap) resultWrap.style.display="none";
+
+    renderControlAgents(activeAgents);
+
+    document.getElementById("metricAgents").textContent=activeAgents.length;
+    document.getElementById("metricActive").textContent="0";
+    document.getElementById("metricPackets").textContent="0";
+    document.getElementById("streamStatus").textContent="BACKEND REQUEST STARTING";
+    document.getElementById("sessionId").textContent="BR-"+Date.now().toString().slice(-6);
+
+    startControlTimer();
+
+    setControlStage("INITIALIZING","Preparing executive network",5);
+    addControlFeed("Boardroom command received.",true);
+    addControlFeed(`Preparing ${activeAgents.length} executive agent${activeAgents.length!==1?"s":""}.`);
+}
+
+function runControlRoomAnimation(activeAgents){
+    setTimeout(()=>{
+        setControlStage("CONNECTING","Connecting executive intelligence channels",15);
+        document.getElementById("streamStatus").textContent="WAITING FOR AI BACKEND";
+        addControlFeed("Secure executive communication channels established.");
+    },450);
+
+    setTimeout(()=>{
+        setControlStage("ANALYZING","AI backend is processing the Boardroom request",28);
+        document.getElementById("streamStatus").textContent="AI BACKEND WORKING";
+        activeAgents.forEach(agent=>setControlAgentState(agent.code,"waiting"));
+        startControlVisualLoop(activeAgents);
+        addControlFeed("AI Boardroom workflow is now running on the backend.",true);
+    },1000);
+}
+
+
+function extractBoardroomResult(data){
+
+    // The backend may return the Boardroom result in different nesting levels.
+    // This function searches safely instead of assuming one exact response format.
+    const priorityKeys=[
+        "validated_ceo_decision",
+        "final_decision",
+        "ceo_decision",
+        "ceo_response",
+        "final_answer",
+        "decision",
+        "answer",
+        "response",
+        "output"
+    ];
+
+    function findValue(obj,depth=0){
+        if(depth>5 || obj===null || obj===undefined) return null;
+
+        if(typeof obj==="string" && obj.trim()) return null;
+
+        if(typeof obj==="object"){
+            for(const key of priorityKeys){
+                if(Object.prototype.hasOwnProperty.call(obj,key)){
+                    const value=obj[key];
+                    if(typeof value==="string" && value.trim()) return value;
+                    if(typeof value==="object" && value!==null){
+                        const nested=findValue(value,depth+1);
+                        if(nested) return nested;
+                        return JSON.stringify(value,null,2);
+                    }
+                }
+            }
+
+            for(const key of ["result","data","boardroom_result","analysis"]){
+                if(Object.prototype.hasOwnProperty.call(obj,key)){
+                    const nested=findValue(obj[key],depth+1);
+                    if(nested) return nested;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    function findReports(obj,depth=0){
+        if(depth>5 || !obj || typeof obj!=="object") return null;
+
+        for(const key of ["executive_reports","agent_reports","reports","executive_analysis"]){
+            if(obj[key]) return obj[key];
+        }
+
+        for(const key of ["result","data","boardroom_result","analysis"]){
+            const nested=findReports(obj[key],depth+1);
+            if(nested) return nested;
+        }
+
+        return null;
+    }
+
+    function findDebate(obj,depth=0){
+        if(depth>5 || !obj || typeof obj!=="object") return null;
+
+        for(const key of ["executive_debate","debate","debate_summary"]){
+            if(obj[key]) return obj[key];
+        }
+
+        for(const key of ["result","data","boardroom_result","analysis"]){
+            const nested=findDebate(obj[key],depth+1);
+            if(nested) return nested;
+        }
+
+        return null;
+    }
+
+    const found=findValue(data);
+
+    return {
+        output: found || JSON.stringify(data,null,2),
+        reports: findReports(data),
+        debate: findDebate(data),
+        result: data?.result || data
+    };
+}
+
+function renderFullControlResult(data){
+
+    const extracted=extractBoardroomResult(data);
+
+    let htmlOutput=`
+        <div class="control-result-full">
+            <div class="result-hero">
+                <div class="result-header">
+                    <div>
+                        <div style="color:#00e676;font-size:10px;letter-spacing:.14em;font-weight:700">
+                            ◈ CEO DECISION COMPLETE
+                        </div>
+                        <div style="color:#7d8899;font-size:11px;margin-top:7px">
+                            Complete Boardroom output is shown below without hiding or skipping available content.
+                        </div>
+                    </div>
+
+                    <div style="display:flex;gap:8px;flex-wrap:wrap">
+                        <span style="padding:7px 10px;border-radius:20px;background:rgba(41,121,255,.12);font-size:8px">
+                            MODE: ${escapeHtml(data?.execution_mode || resultExecutionMode(data) || "BOARDROOM")}
+                        </span>
+                        <span style="padding:7px 10px;border-radius:20px;background:rgba(156,77,255,.12);font-size:8px">
+                            DEPTH: ${escapeHtml(data?.response_mode || "DETAILED")}
+                        </span>
+                    </div>
+                </div>
+
+                ${renderStructuredSections(extracted.output)}
+            </div>
+        </div>
+    `;
+
+    if(extracted.debate){
+        htmlOutput+=`
+            <div class="result-section wide" style="margin-top:16px">
+                <div class="result-section-title">EXECUTIVE DEBATE / CROSS-EXECUTIVE SYNTHESIS</div>
+                <p>${escapeHtml(typeof extracted.debate==="string" ? extracted.debate : JSON.stringify(extracted.debate,null,2))}</p>
+            </div>
+        `;
+    }
+
+    if(extracted.reports && typeof extracted.reports==="object"){
+
+        const entries=Array.isArray(extracted.reports)
+            ? extracted.reports.map((value,index)=>[`EXECUTIVE ${index+1}`,value])
+            : Object.entries(extracted.reports);
+
+        htmlOutput+=`
+            <div class="full-output-title">FULL EXECUTIVE INTELLIGENCE</div>
+            <div class="result-grid" style="margin-top:10px">
+                ${entries.map(([name,value])=>`
+                    <div class="result-section">
+                        <div class="result-section-title">${escapeHtml(String(name).toUpperCase())}</div>
+                        <p>${escapeHtml(typeof value==="string" ? value : JSON.stringify(value,null,2))}</p>
+                    </div>
+                `).join("")}
+            </div>
+        `;
+    }
+
+    // Preserve the complete API response for transparency if useful fields are not represented above.
+    htmlOutput+=`
+        <details style="margin-top:18px">
+            <summary style="cursor:pointer;color:#8d9ab0;font-size:9px;letter-spacing:.12em">
+                VIEW COMPLETE RAW API RESPONSE
+            </summary>
+            <div class="full-output-pre">${escapeHtml(JSON.stringify(data,null,2))}</div>
+        </details>
+    `;
+
+    return htmlOutput;
+}
+
+function resultExecutionMode(data){
+    return data?.result?.execution_mode || data?.result?.mode || "";
+}
+
+
+function showControlResultImmediately(data){
+
+    const wrap=document.getElementById("controlResultWrap");
+    const container=document.getElementById("controlResult");
+
+    if(!wrap || !container){
+        console.error("Control Room result container is missing.");
+        return;
+    }
+
+    try{
+        container.innerHTML=renderFullControlResult(data);
+    }catch(error){
+        console.error("Result rendering error:",error);
+
+        // Guaranteed fallback: always show the complete backend response.
+        container.innerHTML=`
+            <div class="result-section wide">
+                <div class="result-section-title">COMPLETE BOARDROOM RESPONSE</div>
+                <div class="full-output-pre">${escapeHtml(JSON.stringify(data,null,2))}</div>
+            </div>
+        `;
+    }
+
+    wrap.style.display="block";
+    wrap.style.visibility="visible";
+    wrap.style.opacity="1";
+
+    // Put the result directly into the user's view.
+    setTimeout(()=>{
+        wrap.scrollIntoView({behavior:"smooth",block:"start"});
+    },150);
+}
+
+
+
+/* =====================================================
+   FINAL RESULTS PAGE
+   The Control Room is only for live execution.
+   The completed answer opens on a separate readable page.
+===================================================== */
+
+function convertStructuredResultToPremium(html){
+
+    const wrapper=document.createElement("div");
+    wrapper.innerHTML=html || "";
+
+    const sections=[...wrapper.querySelectorAll(".result-section")];
+
+    if(!sections.length){
+        return `
+            <div class="premium-result-card wide">
+                <div class="premium-result-title">COMPLETE ANALYSIS</div>
+                <div class="premium-result-text">${html || "No structured analysis was returned."}</div>
+            </div>
+        `;
+    }
+
+    return sections.map(section=>{
+
+        const title=(section.querySelector(".result-section-title")?.textContent || "BOARDROOM ANALYSIS").trim();
+        const content=section.querySelector("p,ul,ol")?.innerHTML || section.innerHTML;
+        const wide=section.classList.contains("wide") ? "wide" : "";
+
+        return `
+            <div class="premium-result-card ${wide}">
+                <div class="premium-result-title">${escapeHtml(title)}</div>
+                <div class="premium-result-text">${content}</div>
+            </div>
+        `;
+    }).join("");
+}
+
+function formatReportContent(text){
+    const lines=String(text || "").split("\n").map(x=>x.trim()).filter(Boolean);
+    const listLike=lines.length>1 && lines.every(line=>/^[-•*]|^\d+[.)]/.test(line));
+
+    if(listLike){
+        return `<ul>${lines.map(line=>`<li>${escapeHtml(line.replace(/^[-•*]\s*|^\d+[.)]\s*/,""))}</li>`).join("")}</ul>`;
+    }
+
+    return `<p>${escapeHtml(String(text || ""))}</p>`;
+}
+
+function getDecisionReport(text){
+    const sections=parseDecisionSections(String(text || ""));
+
+    const decisionSection=sections.find(s=>[
+        "FINAL DECISION","DECISION","CEO DECISION","FINAL CEO DECISION"
+    ].includes(s.title));
+
+    return {
+        decision:decisionSection?.content || "",
+        sections:sections.filter(s=>s!==decisionSection)
+    };
+}
+
+function renderPremiumSections(sections){
+    if(!sections || !sections.length) return "";
+
+    const wideTitles=[
+        "EXECUTIVE SUMMARY","SUMMARY","KEY FINDINGS","RECOMMENDATION",
+        "ACTION PLAN","RATIONALE","RISKS","CONDITIONS","CONFIDENCE"
+    ];
+
+    return sections.map(section=>{
+        const title=section.title || "BOARDROOM ANALYSIS";
+        const wide=wideTitles.includes(title) ? "wide" : "";
+        return `
+            <div class="premium-result-card ${wide}">
+                <div class="premium-result-title">${escapeHtml(title)}</div>
+                <div class="premium-result-text">${formatReportContent(section.content)}</div>
+            </div>
+        `;
+    }).join("");
+}
+
+/* =====================================================
+   PREMIUM RESULT PAGE — CLEAN EXECUTIVE REPORT
+===================================================== */
+
+function stripMarkdown(text){
+    return String(text || "")
+        .replace(/```[\s\S]*?```/g, "")
+        .replace(/\*\*(.*?)\*\*/g, "$1")
+        .replace(/__(.*?)__/g, "$1")
+        .replace(/#{1,6}\s*/g, "")
+        .trim();
+}
+
+function markdownToCleanHtml(text){
+    const value=stripMarkdown(text);
+    const lines=value.split(/\n+/).map(x=>x.trim()).filter(Boolean);
+    if(!lines.length) return '<p>No additional information was provided.</p>';
+
+    const listLike=lines.length>1 && lines.every(line=>/^(?:[-•*]|\d+[.)])\s*/.test(line));
+    if(listLike){
+        return '<ul>'+lines.map(line=>'<li>'+escapeHtml(line.replace(/^(?:[-•*]|\d+[.)])\s*/,''))+'</li>').join('')+'</ul>';
+    }
+    return lines.map(line=>'<p>'+escapeHtml(line)+'</p>').join('');
+}
+
+function splitSynthesis(text){
+    const clean=String(text || "").replace(/\r/g, "");
+    const labels=[
+        'EXECUTIVE POSITIONS','EXECUTIVE POSITION','AGREEMENTS','DISAGREEMENTS',
+        'STRONGEST ARGUMENTS','MAIN CONCERNS','CROSS-EXECUTIVE SYNTHESIS',
+        'SYNTHESIS','RECOMMENDATION'
+    ];
+    const escaped=labels.map(x=>x.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|');
+    const regex=new RegExp('(?:^|\\n)\\s*(?:#{1,6}\\s*)?('+escaped+')\\s*:?\\s*([\\s\\S]*?)(?=\\n\\s*(?:#{1,6}\\s*)?(?:'+escaped+')\\s*:|$)','gi');
+    const parts=[]; let m;
+    while((m=regex.exec(clean))!==null){
+        parts.push({title:m[1].trim().toUpperCase(),content:m[2].trim()});
+    }
+    return parts;
+}
+
+function extractAgentPositions(text){
+    const clean=String(text || "").replace(/\r/g,'');
+    const positions=[];
+    const knownCodes=(typeof agents!=='undefined' ? agents.map(a=>a.code) : ['CFO','CTO','CMO','COO','CSO','CPO','CRO','LEGAL','RISK','CHRO']);
+    const codePattern=knownCodes.map(x=>x.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|');
+    const regex=new RegExp('(?:^|\\n)\\s*(?:[-•]\\s*)?\\*{0,3}('+codePattern+')\\*{0,3}\\s*:?\\s*([\\s\\S]*?)(?=\\n\\s*(?:[-•]\\s*)?\\*{0,3}(?:'+codePattern+')\\*{0,3}\\s*:|$)','gi');
+    let m;
+    while((m=regex.exec(clean))!==null){
+        const code=m[1].toUpperCase();
+        const opinion=stripMarkdown(m[2]).trim();
+        if(opinion) positions.push({code,opinion});
+    }
+    return positions;
+}
+
+function getAgentInfo(code){
+    const item=(typeof agents!=='undefined') ? agents.find(a=>a.code===String(code).toUpperCase()) : null;
+    const profile=(typeof agentProfiles!=='undefined') ? agentProfiles[String(code).toUpperCase()] : null;
+    return {
+        code:String(code).toUpperCase(),
+        name:item?.name || String(code).toUpperCase(),
+        role:item?.role || '',
+        focus:profile?.lens || []
+    };
+}
+
+function normalizeReports(reports, debateText){
+    const list=[];
+    const seen=new Set();
+
+    if(reports && typeof reports==='object'){
+        const entries=Array.isArray(reports)
+            ? reports.map((v,i)=>[`EXECUTIVE ${i+1}`,v])
+            : Object.entries(reports);
+        entries.forEach(([name,value])=>{
+            const code=String(name).toUpperCase().replace(/[^A-Z]/g,'') || String(name).toUpperCase();
+            const text=typeof value==='string' ? value : JSON.stringify(value,null,2);
+            list.push({code,name:String(name),opinion:stripMarkdown(text)});
+            seen.add(code);
+        });
+    }
+
+    extractAgentPositions(debateText).forEach(pos=>{
+        if(!seen.has(pos.code)){
+            list.push({code:pos.code,name:pos.code,opinion:pos.opinion});
+            seen.add(pos.code);
+        }
+    });
+
+    return list;
+}
+
+function renderExecutiveSynthesis(debateText){
+    const parts=splitSynthesis(debateText);
+    const ignored=['EXECUTIVE POSITIONS','EXECUTIVE POSITION'];
+    const visible=parts.filter(p=>!ignored.includes(p.title) && p.content);
+    if(!visible.length) return '';
+
+    return `
+        <section class="synthesis-section">
+            <div class="executive-section-heading">
+                <div class="section-kicker">BOARDROOM CONCLUSION</div>
+                <h2>Executive Synthesis</h2>
+                <p>How the participating executives aligned, differed, and shaped the final recommendation.</p>
+            </div>
+            <div class="synthesis-grid">
+                ${visible.map(part=>`
+                    <div class="synthesis-item">
+                        <div class="synthesis-label">${escapeHtml(part.title)}</div>
+                        <div class="synthesis-content">${markdownToCleanHtml(part.content)}</div>
+                    </div>
+                `).join('')}
+            </div>
+        </section>
+    `;
+}
+
+function renderExecutiveContributions(reportItems){
+    if(!reportItems.length) return '';
+    return `
+        <section class="executive-contributions-section">
+            <div class="executive-section-heading">
+                <div class="section-kicker">PARTICIPATING AI EXECUTIVES</div>
+                <h2>What Each Agent Analyzed</h2>
+                <p>Each executive evaluated the question from its own professional perspective before the final decision was produced.</p>
+            </div>
+            <div class="agent-contribution-grid">
+                ${reportItems.map(item=>{
+                    const info=getAgentInfo(item.code);
+                    const focus=info.focus.length ? info.focus.join(' • ') : info.role;
+                    return `
+                        <article class="agent-contribution-card">
+                            <div class="agent-card-top">
+                                <div class="agent-code">${escapeHtml(info.code)}</div>
+                                <div>
+                                    <div class="agent-full-name">${escapeHtml(info.name)}</div>
+                                    <div class="agent-role">${escapeHtml(info.role)}</div>
+                                </div>
+                            </div>
+                            ${focus ? `<div class="agent-focus"><span>ANALYSIS FOCUS</span>${escapeHtml(focus)}</div>` : ''}
+                            <div class="agent-view-label">WHAT THIS EXECUTIVE THINKS</div>
+                            <div class="agent-view">${markdownToCleanHtml(item.opinion)}</div>
+                        </article>
+                    `;
+                }).join('')}
+            </div>
+        </section>
+    `;
+}
+
+function showResultsPage(data){
+    const container=document.getElementById('resultsPageContent');
+    if(!container){ console.error('Results page container is missing.'); return; }
+
+    const extracted=extractBoardroomResult(data);
+    const result=(data && data.result && typeof data.result==='object') ? data.result : {};
+    const rawOutput=String(extracted.output || '');
+    const report=getDecisionReport(rawOutput);
+
+    const explicitDecision=
+        data?.validated_ceo_decision || data?.final_decision || data?.ceo_decision || data?.ceo_response ||
+        result.validated_ceo_decision || result.final_decision || result.ceo_decision || result.ceo_response;
+
+    let decisionText=report.decision;
+    if(!decisionText && explicitDecision){
+        decisionText=typeof explicitDecision==='string' ? explicitDecision : JSON.stringify(explicitDecision,null,2);
+        const nested=getDecisionReport(decisionText);
+        if(nested.decision) decisionText=nested.decision;
+    }
+    if(!decisionText) decisionText='The Boardroom completed the analysis and recommends reviewing the findings below before taking action.';
+
+    const sectionsHtml=renderPremiumSections(report.sections);
+    const debateText=extracted.debate
+        ? (typeof extracted.debate==='string' ? extracted.debate : JSON.stringify(extracted.debate,null,2))
+        : '';
+    const reportItems=normalizeReports(extracted.reports, debateText);
+
+    container.innerHTML=`
+        <section class="final-decision-card">
+            <div class="final-decision-label">FINAL CEO DECISION</div>
+            <div class="final-decision-text">${escapeHtml(stripMarkdown(decisionText))}</div>
+        </section>
+
+        ${sectionsHtml ? `<div class="premium-result-grid">${sectionsHtml}</div>` : ''}
+
+        ${renderExecutiveContributions(reportItems)}
+        ${renderExecutiveSynthesis(debateText)}
+    `;
+
+    showSection('resultsPage');
+    const title=document.getElementById('pageTitle');
+    if(title) title.textContent='Executive Decision';
+    window.scrollTo({top:0,behavior:'smooth'});
+}
+
+
+function finishControlRoom(data){
+
+    stopControlVisualLoop();
+
+    controlActiveAgents.forEach(agent=>setControlAgentState(agent.code,"complete"));
+
+    setControlStage("DECISION READY","All executive intelligence has been consolidated",100);
+    addControlFeed("Executive reports consolidated.",true);
+    addControlFeed("CEO decision synthesis and consistency validation completed.",true);
+    addControlFeed("Final Boardroom decision is ready.",true);
+
+    const activeMetric=document.getElementById("metricActive");
+    const streamStatus=document.getElementById("streamStatus");
+
+    if(activeMetric) activeMetric.textContent="0";
+    if(streamStatus) streamStatus.textContent="EXECUTION COMPLETE";
+
+    stopControlTimer();
+
+    // Keep the live Control Room visible briefly, then open the final result
+    // on its own separate, readable page.
+    setTimeout(()=>{
+        showResultsPage(data);
+    },600);
+}
+
+
+/* =====================================================
+   AGENT DATA
+===================================================== */
+
+const agents = [
+
+{
+code:"CFO",
+name:"Chief Financial Officer",
+role:"Finance, costs, revenue and ROI",
+color:"#00e676",
+className:"a1"
+},
+
+{
+code:"CTO",
+name:"Chief Technology Officer",
+role:"Technology, feasibility and security",
+color:"#2979ff",
+className:"a2"
+},
+
+{
+code:"CMO",
+name:"Chief Marketing Officer",
+role:"Market, customers and marketing",
+color:"#ff3d9a",
+className:"a3"
+},
+
+{
+code:"COO",
+name:"Chief Operating Officer",
+role:"Operations and execution",
+color:"#ff8a00",
+className:"a4"
+},
+
+{
+code:"CSO",
+name:"Chief Strategy Officer",
+role:"Strategy and long-term direction",
+color:"#ffd600",
+className:"a5"
+},
+
+{
+code:"CPO",
+name:"Chief Product Officer",
+role:"Product strategy and product-market fit",
+color:"#ff4d4d",
+className:"a6"
+},
+
+{
+code:"CRO",
+name:"Chief Revenue Officer",
+role:"Revenue and sales",
+color:"#9c4dff",
+className:"a7"
+},
+
+{
+code:"LEGAL",
+name:"Legal Advisor",
+role:"Legal and compliance",
+color:"#00e5ff",
+className:"a8"
+},
+
+{
+code:"RISK",
+name:"Risk Officer",
+role:"Business and execution risk",
+color:"#ffb300",
+className:"a9"
+},
+
+{
+code:"CHRO",
+name:"Chief Human Resources Officer",
+role:"People and workforce",
+color:"#00d4a8",
+className:"a10"
+}
+
+];
+
+
+const agentProfiles = {
+    CFO:{
+        mission:"Protect financial health while identifying sustainable investment, profitability and growth opportunities.",
+        lens:["ROI and capital efficiency","Revenue, cost and margin impact","Cash flow and financial risk"],
+        when:["Investment decisions","Pricing or budget questions","Expansion and profitability planning"],
+        questions:["What is the expected return?","What will this cost over time?","Can the business fund this safely?"]
+    },
+    CTO:{
+        mission:"Evaluate whether the technology can be built, scaled, secured and maintained reliably.",
+        lens:["Technical feasibility","Scalability and architecture","Security and implementation risk"],
+        when:["Technology adoption","AI or software strategy","Infrastructure and security decisions"],
+        questions:["Can we build this reliably?","Will it scale?","What technical risks are hidden?"]
+    },
+    CMO:{
+        mission:"Translate customer and market intelligence into demand, positioning and growth opportunities.",
+        lens:["Customer needs","Market positioning","Brand and acquisition impact"],
+        when:["Go-to-market planning","Customer research","Marketing and brand strategy"],
+        questions:["Who is the customer?","Why would they choose us?","How do we create demand?"]
+    },
+    COO:{
+        mission:"Turn strategy into practical execution with efficient processes, capacity and operational control.",
+        lens:["Execution feasibility","Operational efficiency","Dependencies and bottlenecks"],
+        when:["Scaling operations","Process redesign","Execution planning"],
+        questions:["Can the organization execute this?","What resources are required?","Where will bottlenecks appear?"]
+    },
+    CSO:{
+        mission:"Evaluate long-term competitive advantage and ensure individual actions support the overall strategy.",
+        lens:["Strategic alignment","Competitive advantage","Long-term opportunity"],
+        when:["Major company direction","Market expansion","High-impact strategic decisions"],
+        questions:["Does this support our strategy?","What is the long-term advantage?","What alternatives are stronger?"]
+    },
+    CPO:{
+        mission:"Ensure the product solves a meaningful customer problem and has a clear path to product-market fit.",
+        lens:["Customer problem","Product value","Product-market fit"],
+        when:["Product launches","Feature prioritization","Customer validation"],
+        questions:["What problem are we solving?","Who needs this?","What evidence proves demand?"]
+    },
+    CRO:{
+        mission:"Maximize sustainable revenue by connecting sales execution, customer value and growth economics.",
+        lens:["Revenue impact","Sales execution","Customer conversion"],
+        when:["Revenue planning","Sales strategy","Growth targets"],
+        questions:["How does this generate revenue?","Who will buy?","What improves conversion and retention?"]
+    },
+    LEGAL:{
+        mission:"Identify legal, regulatory and compliance obligations before business decisions create avoidable exposure.",
+        lens:["Legal exposure","Regulatory requirements","Compliance obligations"],
+        when:["New markets","Contracts and partnerships","Regulated products or data decisions"],
+        questions:["What rules apply?","What liability could arise?","What must be compliant before launch?"]
+    },
+    RISK:{
+        mission:"Stress-test assumptions and identify downside scenarios before they become expensive surprises.",
+        lens:["Probability of failure","Impact of downside","Mitigation options"],
+        when:["High-uncertainty decisions","Large investments","Launch and expansion risk"],
+        questions:["What could go wrong?","How severe is the downside?","How can we reduce exposure?"]
+    },
+    CHRO:{
+        mission:"Evaluate the people, leadership and organizational capabilities required for successful execution.",
+        lens:["Skills and capacity","Organizational impact","Leadership and change readiness"],
+        when:["Hiring plans","Organizational change","Workforce scaling"],
+        questions:["Do we have the right people?","What skills are missing?","Can the organization absorb this change?"]
+    }
+};
+
+
+/* =====================================================
+   CREATE FLOATING AGENT DECK
+===================================================== */
+
+const deckZone =
+document.getElementById("deckZone");
+
+
+agents.forEach((agent,index)=>{
+
+    const card =
+    document.createElement("div");
+
+    card.className =
+    "agent-float " +
+    agent.className;
+
+    card.style.setProperty(
+        "--agent-color",
+        agent.color
+    );
+
+    card.style.setProperty(
+        "--enter-x",
+        (index%2===0 ? "-300px":"300px")
+    );
+
+    card.style.setProperty(
+        "--enter-y",
+        (index%3===0 ? "-200px":"200px")
+    );
+
+    card.style.setProperty(
+        "--enter-rotate",
+        (index%2===0 ? "-30deg":"30deg")
+    );
+
+
+    card.innerHTML = `
+
+    <div class="agent-top">
+
+        <div class="agent-orb">
+
+            ${agent.code}
+
+        </div>
+
+        <div class="agent-number">
+
+            0${index+1}
+
+        </div>
+
+    </div>
+
+    <h3>
+
+        ${agent.code}
+
+    </h3>
+
+    <p>
+
+        ${agent.role}
+
+    </p>
+
+    <div class="agent-status">
+
+        INTELLIGENCE READY
+
+    </div>
+
+    `;
+
+
+    card.addEventListener(
+    "click",
+    ()=>selectAgent(agent,card)
+    );
+
+
+    deckZone.appendChild(card);
+
+});
+
+
+/* =====================================================
+   AGENT SELECT
+===================================================== */
+
+function selectAgent(agent,card){
+
+    document
+    .querySelectorAll(".agent-float")
+    .forEach(c=>
+        c.classList.remove("active")
+    );
+
+    card.classList.add("active");
+
+
+    document
+    .getElementById("infoName")
+    .textContent =
+    agent.code +
+    " — " +
+    agent.name;
+
+
+    document
+    .getElementById("infoText")
+    .textContent =
+    agent.role;
+
+
+    document
+    .getElementById("agentInfo")
+    .classList.add("show");
+
+}
+
+
+/* =====================================================
+   3D PARALLAX
+===================================================== */
+
+const hero =
+document.getElementById("hero");
+
+
+hero.addEventListener(
+"mousemove",
+event=>{
+
+    const rect =
+    hero.getBoundingClientRect();
+
+    const x =
+    (event.clientX-rect.left)
+    /rect.width-.5;
+
+    const y =
+    (event.clientY-rect.top)
+    /rect.height-.5;
+
+
+    deckZone.style.transform =
+
+    `rotateX(${y*-6}deg)
+     rotateY(${x*8}deg)`;
+
+
+    document
+    .querySelectorAll(".agent-float")
+    .forEach((card,index)=>{
+
+        const depth =
+        (index%3)+1;
+
+        card.style.marginLeft =
+        (x*depth*8)+"px";
+
+        card.style.marginTop =
+        (y*depth*8)+"px";
+
+    });
+
+}
+);
+
+
+hero.addEventListener(
+"mouseleave",
+()=>{
+
+    deckZone.style.transform =
+    "rotateX(0deg) rotateY(0deg)";
+
+    document
+    .querySelectorAll(".agent-float")
+    .forEach(card=>{
+
+        card.style.marginLeft="0";
+        card.style.marginTop="0";
+
+    });
+
+}
+);
+
+
+/* =====================================================
+   RENDER NORMAL AGENT CARDS
+===================================================== */
+
+function renderAgentGrids(){
+
+const cards=
+agents.map(agent=>`
+
+<div class="agent-card"
+     data-agent-code="${agent.code}"
+     role="button"
+     tabindex="0"
+     aria-label="Open ${agent.code} intelligence profile">
+
+<div class="agent-avatar"
+
+style="
+color:${agent.color};
+border:2px solid ${agent.color};
+background:${agent.color}15">
+
+${agent.code}
+
+</div>
+
+<div class="agent-name">
+
+${agent.code}
+
+</div>
+
+<div class="agent-role">
+
+${agent.role}
+
+</div>
+
+</div>
+
+`).join("");
+
+document.getElementById("overviewAgents").innerHTML=cards;
+document.getElementById("allAgents").innerHTML=cards;
+
+document.querySelectorAll(".agent-card[data-agent-code]").forEach(card=>{
+    const openProfile=()=>{
+        const agent=agents.find(a=>a.code===card.dataset.agentCode);
+        if(agent) openAgentProfile(agent);
+    };
+
+    card.addEventListener("click",openProfile);
+
+    card.addEventListener("keydown",event=>{
+        if(event.key==="Enter" || event.key===" "){
+            event.preventDefault();
+            openProfile();
+        }
+    });
+});
+
+}
+renderAgentGrids();
+
+
+
+/* =====================================================
+   AGENT INTELLIGENCE PROFILE
+===================================================== */
+
+function listItems(items){
+    return items.map(item=>`<li>${escapeHtml(item)}</li>`).join("");
+}
+
+function openAgentProfile(agent){
+
+    const profile=agentProfiles[agent.code];
+
+    document.getElementById("modalAgentCode").textContent=agent.code;
+    document.getElementById("modalAgentCode").style.color=agent.color;
+    document.getElementById("modalAgentCode").style.borderColor=agent.color;
+
+    document.getElementById("modalAgentName").textContent=
+        `${agent.code} — ${agent.name}`;
+
+    document.getElementById("modalAgentRole").textContent=agent.role;
+    document.getElementById("modalAgentMission").textContent=profile.mission;
+    document.getElementById("modalAgentLens").innerHTML=listItems(profile.lens);
+    document.getElementById("modalAgentWhen").innerHTML=listItems(profile.when);
+    document.getElementById("modalAgentQuestions").innerHTML=listItems(profile.questions);
+
+    const modal=document.getElementById("agentModal");
+    if(!modal) return;
+    modal.classList.add("show");
+    modal.setAttribute("aria-hidden","false");
+}
+
+function closeAgentProfile(){
+    const modal=document.getElementById("agentModal");
+    if(!modal) return;
+    modal.classList.remove("show");
+    modal.setAttribute("aria-hidden","true");
+}
+
+// Robust close handling works even though the modal markup is placed after the main script.
+document.addEventListener("click",event=>{
+    if(event.target.closest && event.target.closest("#agentModalClose")){
+        event.preventDefault();
+        closeAgentProfile();
+    }
+    if(event.target && event.target.id==="agentModalBackdrop"){
+        closeAgentProfile();
+    }
+});
+
+const agentModalClose=document.getElementById("agentModalClose");
+const agentModalBackdrop=document.getElementById("agentModalBackdrop");
+
+if(agentModalClose) agentModalClose.addEventListener("click",closeAgentProfile);
+if(agentModalBackdrop) agentModalBackdrop.addEventListener("click",closeAgentProfile);
+
+document.addEventListener("keydown",event=>{
+    if(event.key==="Escape") closeAgentProfile();
+});
+
+
+
+/* =====================================================
+   NAVIGATION
+===================================================== */
+
+const navItems =
+document.querySelectorAll(".nav-item");
+
+
+const sections =
+document.querySelectorAll(".section");
+
+
+function showSection(name){
+
+    sections.forEach(section=>
+        section.classList.remove("active")
+    );
+
+
+    document
+    .getElementById(name)
+    .classList.add("active");
+
+
+    navItems.forEach(item=>{
+
+        item.classList.remove("active");
+
+        if(item.dataset.section===name){
+
+            item.classList.add("active");
+
+            document
+            .getElementById("pageTitle")
+            .textContent =
+            item.textContent.trim();
+
+        }
+
+    });
+
+}
+
+
+navItems.forEach(item=>{
+
+    item.addEventListener(
+    "click",
+    ()=>showSection(item.dataset.section)
+    );
+
+});
+
+
+/* =====================================================
+   INPUT MODE
+===================================================== */
+
+let inputMode="question";
+let responseMode="Detailed Analysis";
+let boardMode="Fast Intelligence";
+
+window.addEventListener("DOMContentLoaded", updateDocumentUploadVisibility);
+
+
+document
+.querySelectorAll(".mode-card")
+.forEach(card=>{
+
+    card.addEventListener(
+    "click",
+    ()=>{
+
+        document
+        .querySelectorAll(".mode-card")
+        .forEach(c=>
+            c.classList.remove("selected")
+        );
+
+        card.classList.add("selected");
+
+        inputMode=
+        card.dataset.input;
+
+        updateDocumentUploadVisibility();
+
+    });
+
+});
+
+
+/* =====================================================
+   DOCUMENT INPUT
+===================================================== */
+
+const documentUploadArea =
+document.getElementById("documentUploadArea");
+
+const documentInput =
+document.getElementById("documentInput");
+
+const selectedDocumentName =
+document.getElementById("selectedDocumentName");
+
+function updateDocumentUploadVisibility(){
+
+    const needsDocument =
+    inputMode === "question-document" ||
+    inputMode === "document";
+
+    documentUploadArea.style.display =
+    needsDocument ? "block" : "none";
+
+    const questionInput =
+    document.getElementById("questionInput");
+
+    if(inputMode === "document"){
+        questionInput.placeholder =
+        "Optional: add a question about this document...";
+    } else {
+        questionInput.placeholder =
+        "Describe your business challenge...";
+    }
+
+}
+
+documentInput.addEventListener(
+"change",
+()=>{
+
+    const file = documentInput.files[0];
+
+    selectedDocumentName.textContent =
+    file
+    ? `SELECTED: ${file.name}`
+    : "";
+
+}
+);
+
+
+/* =====================================================
+   RESPONSE MODE
+===================================================== */
+
+document
+.querySelectorAll(".option")
+.forEach(option=>{
+
+    option.addEventListener(
+    "click",
+    ()=>{
+
+        document
+        .querySelectorAll(".option")
+        .forEach(o=>
+            o.classList.remove("selected")
+        );
+
+        option.classList.add("selected");
+
+        responseMode=
+        option.dataset.response;
+
+    });
+
+});
+
+
+/* =====================================================
+   BOARD MODE
+===================================================== */
+
+document
+.querySelectorAll("[data-board]")
+.forEach(option=>{
+
+    option.addEventListener(
+    "click",
+    ()=>{
+
+        document
+        .querySelectorAll("[data-board]")
+        .forEach(o=>
+            o.classList.remove("selected")
+        );
+
+        option.classList.add("selected");
+
+        boardMode=
+        option.dataset.board;
+
+    });
+
+});
+
+
+/* =====================================================
+   ACTIVATE BOARDROOM
+===================================================== */
+
+let agentSelectionMode="auto";
+let manualSelectedAgents=[];
+
+
+function renderManualAgentSelection(){
+
+    const grid=document.getElementById("manualAgentsGrid");
+
+    if(!grid) return;
+
+    grid.innerHTML=agents.map(agent=>`
+
+        <div class="option ${manualSelectedAgents.includes(agent.code.toLowerCase()) ? "selected" : ""}"
+             data-manual-agent="${agent.code.toLowerCase()}"
+             style="text-align:left;padding:14px">
+
+            <strong style="display:block;color:${agent.color};font-size:12px">${agent.code}</strong>
+            <span style="font-size:8px;color:#999">${agent.name}</span>
+
+        </div>
+
+    `).join("");
+
+    grid.querySelectorAll("[data-manual-agent]").forEach(card=>{
+
+        card.addEventListener("click",()=>{
+
+            const code=card.dataset.manualAgent;
+
+            if(manualSelectedAgents.includes(code)){
+                manualSelectedAgents=manualSelectedAgents.filter(a=>a!==code);
+            }else{
+                manualSelectedAgents.push(code);
+            }
+
+            renderManualAgentSelection();
+
+        });
+
+    });
+
+}
+
+
+function setupAgentSelection(){
+
+    const auto=document.getElementById("autoAgentsOption");
+    const manual=document.getElementById("manualAgentsOption");
+    const panel=document.getElementById("manualAgentsPanel");
+
+    auto.addEventListener("click",()=>{
+        agentSelectionMode="auto";
+        auto.classList.add("selected");
+        manual.classList.remove("selected");
+        panel.style.display="none";
+    });
+
+    manual.addEventListener("click",()=>{
+        agentSelectionMode="manual";
+        manual.classList.add("selected");
+        auto.classList.remove("selected");
+        panel.style.display="block";
+        renderManualAgentSelection();
+    });
+
+    document.getElementById("selectAllAgents").addEventListener("click",()=>{
+        manualSelectedAgents=agents.map(a=>a.code.toLowerCase());
+        renderManualAgentSelection();
+    });
+
+    document.getElementById("clearAllAgents").addEventListener("click",()=>{
+        manualSelectedAgents=[];
+        renderManualAgentSelection();
+    });
+
+}
+
+
+setupAgentSelection();
+
+
+let history=[];
+
+
+document
+.getElementById("activateButton")
+.addEventListener(
+"click",
+activateBoardroom
+);
+
+
+function activateBoardroom(){
+
+    const question =
+    document
+    .getElementById("questionInput")
+    .value.trim();
+
+
+    const selectedFile =
+    document.getElementById("documentInput").files[0];
+
+    const requiresQuestion =
+    inputMode === "question" ||
+    inputMode === "question-document";
+
+    const requiresDocument =
+    inputMode === "question-document" ||
+    inputMode === "document";
+
+    if(requiresQuestion && !question){
+
+        alert(
+        "Please enter a business question."
+        );
+
+        return;
+
+    }
+
+    if(requiresDocument && !selectedFile){
+
+        alert(
+        "Please select a document."
+        );
+
+        return;
+
+    }
+
+    if(agentSelectionMode === "manual" && manualSelectedAgents.length === 0){
+
+        alert("Please select at least one executive agent.");
+        return;
+
+    }
+
+
+    /* WOW ACTIVATION */
+
+    const overlay =
+    document.getElementById(
+        "activationOverlay"
+    );
+
+    overlay.classList.add("show");
+
+
+    /* animate agent cards */
+
+    document
+    .querySelectorAll(".agent-float")
+    .forEach((card,index)=>{
+
+        card.style.transition =
+        "all .8s cubic-bezier(.2,.8,.2,1)";
+
+        setTimeout(()=>{
+
+            card.style.left="50%";
+            card.style.top="50%";
+
+            card.style.right="auto";
+            card.style.bottom="auto";
+
+            card.style.transform =
+
+            `translate(-50%,-50%)
+             rotate(${index*36}deg)
+             translateY(-180px)
+             rotate(${-index*36}deg)`;
+
+        },50);
+
+    });
+
+
+    setTimeout(()=>{
+
+        overlay.classList.remove("show");
+
+        startAnalysis(question);
+
+    },1500);
+
+}
+
+
+/* =====================================================
+   ANALYSIS
+===================================================== */
+
+async function startAnalysis(question){
+
+    const analysisQuestion =
+    document.getElementById("analysisQuestion");
+
+    analysisQuestion.textContent =
+    question ||
+    "Analyzing uploaded business document...";
+
+
+    /* =====================================================
+       MAP UI VALUES TO FASTAPI VALUES
+    ===================================================== */
+
+    const modeMap = {
+        "question": "question_only",
+        "question-document": "question_with_document",
+        "document": "document_only"
+    };
+
+    const responseMap = {
+        "Short Insight": "short",
+        "Executive Summary": "executive_summary",
+        "Detailed Analysis": "detailed"
+    };
+
+    const executionMap = {
+        "Fast Intelligence": "fast",
+        "Deep Boardroom Analysis": "accurate"
+    };
+
+    const backendMode =
+    modeMap[inputMode];
+
+    const backendResponseMode =
+    responseMap[responseMode];
+
+    const backendExecutionMode =
+    executionMap[boardMode];
+
+
+    /* =====================================================
+       SHOW PROGRESS UI
+    ===================================================== */
+
+    const activeAgents =
+
+    agentSelectionMode === "manual"
+
+    ? agents.filter(agent => manualSelectedAgents.includes(agent.code.toLowerCase()))
+
+    : (boardMode==="Fast Intelligence"
+        ? agents.slice(0,5)
+        : agents);
+
+
+    openControlRoom(activeAgents);
+    runControlRoomAnimation(activeAgents);
+
+
+    document
+    .getElementById("progressList")
+    .innerHTML=
+
+    activeAgents.map((agent,index)=>`
+
+    <div class="progress-item">
+
+        <div class="progress-left">
+
+            <div class="progress-icon"
+
+            style="
+            border:2px solid ${agent.color};
+            color:${agent.color}">
+
+                ${agent.code}
+
+            </div>
+
+            <div>
+
+                <div class="progress-name">
+
+                    ${agent.code}
+
+                </div>
+
+                <div class="progress-task">
+
+                    ${agent.role}
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="progress-status"
+        id="progress${index}">
+
+            CONNECTING...
+
+        </div>
+
+    </div>
+
+    `).join("");
+
+
+    activeAgents.forEach(
+    (agent,index)=>{
+
+        setTimeout(()=>{
+
+            const el=
+            document.getElementById(
+                "progress"+index
+            );
+
+            if(el)
+            el.textContent=
+            "ANALYZING...";
+
+            setControlAgentState(
+                agent.code,
+                "analyzing"
+            );
+
+        },index*500);
+
+    });
+
+
+    document
+    .getElementById("analysisOutput")
+    .innerHTML=`
+
+    <div style="
+    padding:22px;
+    border-radius:16px;
+    background:rgba(255,255,255,.03);
+    border:1px solid rgba(41,121,255,.35)">
+
+        <strong style="color:#00e5ff">
+            ◈ BOARDROOM ANALYSIS IN PROGRESS
+        </strong>
+
+        <br><br>
+
+        <span style="color:#999">
+            Connecting to the AI Boardroom backend and
+            running executive analysis...
+        </span>
+
+    </div>
+    `;
+
+
+    /* =====================================================
+       CREATE FASTAPI FORM DATA
+    ===================================================== */
+
+    const formData =
+    new FormData();
+
+    if(question){
+        formData.append(
+            "question",
+            question
+        );
+    }
+
+    formData.append(
+        "mode",
+        backendMode
+    );
+
+    formData.append(
+        "response_mode",
+        backendResponseMode
+    );
+
+    formData.append(
+        "execution_mode",
+        backendExecutionMode
+    );
+
+
+    // In AUTO mode do not send selected_agents.
+    // The backend will automatically choose relevant agents.
+    if(agentSelectionMode === "manual"){
+
+        formData.append(
+            "selected_agents",
+            JSON.stringify(manualSelectedAgents)
+        );
+
+    }
+
+
+    const documentInput =
+    document.getElementById("documentInput");
+
+    const selectedFile =
+    documentInput.files[0];
+
+    if(selectedFile){
+
+        formData.append(
+            "document",
+            selectedFile
+        );
+
+    }
+
+
+/* =====================================================
+       CALL FASTAPI BACKEND
+    ===================================================== */
+
+    try{
+
+        const response =
+        await fetch(
+            "http://127.0.0.1:8000/boardroom/analyze",
+            {
+                method:"POST",
+                body:formData
+            }
+        );
+
+
+        let data;
+        const responseText=await response.text();
+
+        try{
+            data=responseText ? JSON.parse(responseText) : {};
+        }catch{
+            // If backend returns plain text, still show it instead of hiding the output.
+            data={raw_response:responseText};
+        }
+
+
+        if(!response.ok){
+
+            const detail =
+            data.detail;
+
+            const message =
+
+            typeof detail === "string"
+
+            ?detail
+
+            :detail?.message ||
+
+            detail?.error ||
+
+            "Boardroom analysis failed.";
+
+            throw new Error(message);
+
+        }
+
+
+        console.log(
+            "AI Boardroom result:",
+            data
+        );
+
+
+        /* =================================================
+           MARK AGENTS COMPLETE
+        ================================================= */
+
+        activeAgents.forEach(
+        (agent,index)=>{
+
+            const el =
+            document.getElementById(
+                "progress"+index
+            );
+
+            if(el)
+            el.textContent =
+            "COMPLETE ✓";
+
+        });
+
+
+        // Show ONLY ONE final result: the structured Control Room result.
+        try{
+            finishControlRoom(data);
+        }catch(controlRoomError){
+            console.error("Control Room result error:", controlRoomError);
+            throw controlRoomError;
+        }
+
+
+        /* =================================================
+           SAVE HISTORY
+        ================================================= */
+
+        history.push({
+
+            question:
+            question ||
+            selectedFile?.name ||
+            "Document Analysis",
+
+            time:
+            new Date().toLocaleString(),
+
+            result:data
+
+        });
+
+
+        // History UI may be removed from this version of the dashboard.
+        const historyList=document.getElementById("historyList");
+        if(historyList){
+            renderHistory();
+        }
+
+        const analysisCount=document.getElementById("analysisCount");
+        if(analysisCount){
+            analysisCount.textContent=history.length;
+        }
+
+    }
+
+
+    catch(error){
+
+        console.error(
+            "Boardroom API error:",
+            error
+        );
+
+        stopControlTimer();
+        setControlStage(
+            "EXECUTION ERROR",
+            "The Boardroom request could not be completed",
+            100
+        );
+        addControlFeed(`Execution error: ${error.message}`);
+
+
+        activeAgents.forEach(
+        (agent,index)=>{
+
+            const el =
+            document.getElementById(
+                "progress"+index
+            );
+
+            if(el)
+            el.textContent =
+            "ERROR";
+
+        });
+
+
+        document
+        .getElementById("analysisOutput")
+        .innerHTML=`
+
+        <div style="
+        padding:22px;
+        border-radius:16px;
+        border:1px solid rgba(255,77,77,.45);
+        background:rgba(255,77,77,.06)">
+
+            <strong style="color:#ff4d4d">
+                ⚠ BOARDROOM ERROR
+            </strong>
+
+            <br><br>
+
+            <span style="color:#ccc">
+                ${escapeHtml(error.message)}
+            </span>
+
+            <br><br>
+
+            <span style="
+            color:#888;
+            font-size:8px">
+
+                Make sure your FastAPI server is running
+                and the /boardroom/analyze route is available.
+
+            </span>
+
+        </div>
+        `;
+
+    }
+
+}
+
+
+/* =====================================================
+   DISPLAY BACKEND RESULT
+===================================================== */
+
+function parseDecisionSections(text){
+
+    const labels=[
+        "FINAL DECISION",
+        "DECISION",
+        "WHY",
+        "RATIONALE",
+        "KEY FINDINGS",
+        "KEY FACTORS",
+        "RISKS",
+        "NEXT STEP",
+        "NEXT STEPS",
+        "RECOMMENDATION",
+        "ACTION PLAN",
+        "CONDITIONS",
+        "CONFIDENCE"
+    ];
+
+    const escaped=labels
+        .sort((a,b)=>b.length-a.length)
+        .map(label=>label.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"))
+        .join("|");
+
+    const regex=new RegExp(
+        `(?:^|\\n)\\s*(${escaped})\\s*:\\s*([\\s\\S]*?)(?=\\n\\s*(?:${escaped})\\s*:|$)`,
+        "gi"
+    );
+
+    const sections=[];
+    let match;
+
+    while((match=regex.exec(text))!==null){
+        sections.push({
+            title:match[1].trim().toUpperCase(),
+            content:match[2].trim()
+        });
+    }
+
+    return sections;
+}
+
+function renderStructuredSections(text){
+
+    const sections=parseDecisionSections(text);
+
+    if(!sections.length){
+        return `<div class="raw-result">${escapeHtml(text)}</div>`;
+    }
+
+    const decision=sections.find(s =>
+        s.title==="FINAL DECISION" || s.title==="DECISION"
+    );
+
+    const remaining=sections.filter(s=>s!==decision);
+
+    let output="";
+
+    if(decision){
+        output+=`
+            <div class="decision-card">
+                <div class="decision-label">CEO FINAL DECISION</div>
+                <div class="decision-text">${escapeHtml(decision.content)}</div>
+            </div>
+        `;
+    }
+
+    output+=`<div class="result-grid">`;
+
+    remaining.forEach(section=>{
+
+        const isWide=[
+            "WHY","RATIONALE","KEY FINDINGS","RECOMMENDATION","ACTION PLAN"
+        ].includes(section.title);
+
+        const lines=section.content
+            .split("\n")
+            .map(x=>x.trim())
+            .filter(Boolean);
+
+        const listLike=lines.length>1 &&
+            lines.every(line=>/^[-•*]|\d+[.)]/.test(line));
+
+        const content=listLike
+            ? `<ul>${lines.map(line=>
+                `<li>${escapeHtml(line.replace(/^[-•*]\s*|\d+[.)]\s*/,""))}</li>`
+              ).join("")}</ul>`
+            : `<p>${escapeHtml(section.content)}</p>`;
+
+        output+=`
+            <div class="result-section ${isWide?"wide":""}">
+                <div class="result-section-title">${escapeHtml(section.title)}</div>
+                ${content}
+            </div>
+        `;
+    });
+
+    output+=`</div>`;
+
+    return output;
+}
+
+function displayBoardroomResult(data){
+
+    const result=data.result || {};
+
+    const finalDecision=
+        data.final_decision ??
+        result.final_decision ??
+        result.ceo_response ??
+        result.ceo_decision ??
+        result.answer ??
+        result.response ??
+        result;
+
+    const output=
+        typeof finalDecision==="string"
+        ? finalDecision
+        : JSON.stringify(finalDecision,null,2);
+
+    const reports=
+        data.executive_reports ??
+        result.executive_reports ??
+        data.agent_reports ??
+        result.agent_reports;
+
+    let reportsHtml="";
+
+    if(reports && typeof reports==="object"){
+        const entries=Array.isArray(reports)
+            ? reports.map((value,index)=>[`EXECUTIVE ${index+1}`,value])
+            : Object.entries(reports);
+
+        if(entries.length){
+            reportsHtml=`
+                <div class="result-section wide" style="margin-top:14px">
+                    <div class="result-section-title">EXECUTIVE CONTRIBUTIONS</div>
+                    ${entries.map(([name,value])=>`
+                        <div style="padding:12px 0;border-bottom:1px solid rgba(255,255,255,.06)">
+                            <strong style="color:#00e5ff;font-size:10px">${escapeHtml(name.toUpperCase())}</strong>
+                            <p style="margin-top:7px">${escapeHtml(typeof value==="string"?value:JSON.stringify(value,null,2))}</p>
+                        </div>
+                    `).join("")}
+                </div>
+            `;
+        }
+    }
+
+    document.getElementById("analysisOutput").innerHTML=`
+        <div class="result-hero">
+
+            <div class="result-header">
+                <div>
+                    <div style="color:#00e676;font-size:10px;letter-spacing:.14em;font-weight:700">
+                        ◈ BOARDROOM ANALYSIS COMPLETE
+                    </div>
+                    <div style="color:#7d8899;font-size:11px;margin-top:7px">
+                        Executive intelligence consolidated into a CEO-level decision.
+                    </div>
+                </div>
+
+                <div style="display:flex;gap:8px;flex-wrap:wrap">
+                    <span style="padding:7px 10px;border-radius:20px;background:rgba(41,121,255,.12);font-size:8px">
+                        MODE: ${escapeHtml(data.execution_mode || "unknown")}
+                    </span>
+                    <span style="padding:7px 10px;border-radius:20px;background:rgba(156,77,255,.12);font-size:8px">
+                        DEPTH: ${escapeHtml(data.response_mode || "unknown")}
+                    </span>
+                </div>
+            </div>
+
+            ${renderStructuredSections(output)}
+            ${reportsHtml}
+
+        </div>
+    `;
+}
+
+/* =====================================================
+   SAFE HTML OUTPUT
+===================================================== */
+
+function escapeHtml(value){
+
+    return String(value)
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+
+}
+
+
+
+/* =====================================================
+   HISTORY
+===================================================== */
+
+function renderHistory(){
+
+    const container =
+    document.getElementById(
+        "historyList"
+    );
+
+
+    container.innerHTML=
+
+    history.slice()
+    .reverse()
+    .map(item=>`
+
+    <div class="history-item">
+
+        <div class="history-title">
+
+            BOARDROOM ANALYSIS
+
+        </div>
+
+        <div class="history-question">
+
+            ${item.question}
+
+        </div>
+
+        <div class="history-time">
+
+            ${item.time}
+
+        </div>
+
+    </div>
+
+    `).join("");
+
+}
+
+
+/* =====================================================
+   HERO LOAD
+===================================================== */
+
+window.addEventListener(
+"load",
+()=>{
+
+    setTimeout(()=>{
+
+        document
+        .getElementById("hero")
+        .classList.add("loaded");
+
+    },300);
+
+});
+
+</script>
+
+
+<!-- AGENT INTELLIGENCE DETAIL MODAL -->
+<div class="agent-modal" id="agentModal" aria-hidden="true">
+    <div class="agent-modal-backdrop" id="agentModalBackdrop" onclick="closeAgentProfile()"></div>
+
+    <div class="agent-modal-card">
+        <button type="button" class="agent-modal-close" id="agentModalClose" aria-label="Close" onclick="closeAgentProfile(); return false;">×</button>
+
+        <div class="agent-modal-top">
+            <div class="agent-modal-avatar" id="modalAgentCode">AI</div>
+            <div>
+                <div class="eyebrow">EXECUTIVE INTELLIGENCE PROFILE</div>
+                <h2 id="modalAgentName">Executive Agent</h2>
+                <p id="modalAgentRole"></p>
+            </div>
+        </div>
+
+        <div class="agent-detail-grid">
+            <div class="agent-detail-block wide">
+                <div class="detail-label">PRIMARY MISSION</div>
+                <p id="modalAgentMission"></p>
+            </div>
+
+            <div class="agent-detail-block">
+                <div class="detail-label">DECISION LENS</div>
+                <ul id="modalAgentLens"></ul>
+            </div>
+
+            <div class="agent-detail-block">
+                <div class="detail-label">BEST USED WHEN</div>
+                <ul id="modalAgentWhen"></ul>
+            </div>
+
+            <div class="agent-detail-block wide">
+                <div class="detail-label">KEY QUESTIONS THIS AGENT ASKS</div>
+                <ul id="modalAgentQuestions"></ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

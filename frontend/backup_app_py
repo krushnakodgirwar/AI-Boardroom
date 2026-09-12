@@ -1,0 +1,1190 @@
+/* import json
+import time
+from concurrent.futures import ThreadPoolExecutor
+import requests
+import streamlit as st
+import streamlit.components.v1 as components
+
+API_URL = "http://127.0.0.1:8000/boardroom/analyze"
+
+AVAILABLE_AGENTS = {
+    "cfo": "CFO — Finance, costs, revenue and ROI",
+    "cto": "CTO — Technology, feasibility and security",
+    "cmo": "CMO — Market, customers and marketing",
+    "coo": "COO — Operations and execution",
+    "cso": "CSO — Strategy and long-term direction",
+    "cpo": "CPO — Product strategy and product-market fit",
+    "cro": "CRO — Revenue and sales",
+    "legal": "Legal Advisor — Legal and compliance",
+    "risk": "Risk Officer — Business and execution risk",
+    "chro": "CHRO — People and workforce",
+}
+
+AGENT_META = {
+    "cfo": ("CFO", "Finance & ROI", "◌"), "cto": ("CTO", "Technology", "⌁"),
+    "cmo": ("CMO", "Market & Customers", "◈"), "coo": ("COO", "Operations", "◇"),
+    "cso": ("CSO", "Strategy", "◎"), "cpo": ("CPO", "Product", "◆"),
+    "cro": ("CRO", "Revenue & Sales", "↗"), "legal": ("LEGAL", "Compliance", "§"),
+    "risk": ("RISK", "Risk & Exposure", "△"), "chro": ("CHRO", "People", "○"),
+}
+
+st.set_page_config(page_title="AI Boardroom", page_icon="◈", layout="wide", initial_sidebar_state="expanded")
+
+st.markdown(r"""
+<style>
+:root{
+  --bg:#07090f; --bg2:#0b0e16; --panel:#101521; --panel2:#141a27; --panel3:#181f2e;
+  --line:rgba(226,232,240,.08); --line2:rgba(226,232,240,.15);
+  --text:#f7f8fc; --muted:#98a2b5; --muted2:#667085;
+  --indigo:#7c6cff; --indigo2:#9b91ff; --cyan:#45d6c1; --blue:#5ca8ff;
+  --amber:#f4c15d; --rose:#ff718f; --green:#5ee0a0;
+}
+   html,body,[class*="css"]{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.stApp{background:
+ radial-gradient(900px 420px at 78% -10%,rgba(92,168,255,.10),transparent 62%),
+ radial-gradient(720px 360px at 25% 0%,rgba(124,108,255,.10),transparent 58%),
+ linear-gradient(180deg,#080a10 0%,#07090f 55%,#06080d 100%); color:var(--text)}
+.stApp:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.20;background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:56px 56px;mask-image:linear-gradient(to bottom,black,transparent 80%)}
+header[data-testid="stHeader"]{background:transparent}#MainMenu,footer{visibility:hidden}.block-container{max-width:1440px;padding:26px 38px 72px}
+section[data-testid="stSidebar"]{background:linear-gradient(180deg,#0a0d14,#080b11);border-right:1px solid var(--line)}section[data-testid="stSidebar"]>div{padding:20px 14px}section[data-testid="stSidebar"] *{color:var(--text)}
+.br-side-brand{padding:4px 7px 20px;border-bottom:1px solid var(--line);margin-bottom:14px}.br-side-title{font-size:13px;font-weight:800;letter-spacing:-.02em}.br-side-caption{font-size:10px;color:var(--muted2)!important;margin-top:4px;letter-spacing:.12em;text-transform:uppercase}
+.br-side-section{color:#7c879a!important;font-size:10px!important;text-transform:uppercase;letter-spacing:.18em;font-weight:800;margin:19px 7px 8px}.br-side-info{border:1px solid var(--line);background:#0e131c;border-radius:12px;padding:13px;font-size:12px;color:#8d97a9!important;line-height:1.6}
+.br-topbar{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:4px 0 25px}.br-brand{display:flex;align-items:center;gap:12px}.br-mark{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(145deg,#201b43,#111522);border:1px solid rgba(155,145,255,.30);color:#c0baff;font-size:15px;font-weight:900;box-shadow:inset 0 1px rgba(255,255,255,.07)}.br-brand-title{font-size:14px;font-weight:800}.br-brand-sub{color:var(--muted2);font-size:9px;margin-top:3px;letter-spacing:.10em;text-transform:uppercase}.br-top-actions{display:flex;gap:8px;flex-wrap:wrap}.br-pill{display:flex;align-items:center;gap:8px;padding:8px 11px;border:1px solid var(--line);background:rgba(13,17,25,.82);border-radius:999px;color:#aeb7c6;font-size:10px}.br-live-dot{width:6px;height:6px;border-radius:50%;background:var(--cyan);box-shadow:0 0 0 4px rgba(69,214,193,.07)}
+.br-hero{padding:9px 0 30px;max-width:1000px}.br-eyebrow,.br-section-label{color:#788396;font-size:9px;letter-spacing:.19em;text-transform:uppercase;font-weight:800}.br-page-title{font-size:44px;line-height:1.03;letter-spacing:-.055em;font-weight:820;margin-top:8px;background:linear-gradient(100deg,#fff 10%,#d8d5ff 58%,#9fdcf2 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}.br-page-sub{color:#929caf;font-size:13px;line-height:1.7;max-width:760px;margin-top:11px}.br-section-label{margin:28px 0 11px}
+.br-panel{background:linear-gradient(145deg,rgba(18,24,35,.94),rgba(11,15,23,.96));border:1px solid var(--line);border-radius:18px;box-shadow:inset 0 1px rgba(255,255,255,.025)}.br-panel-inner{padding:22px}.br-question-head{display:flex;justify-content:space-between;gap:15px;margin-bottom:15px}.br-question-title{font-size:13px;font-weight:760;letter-spacing:-.01em}.br-question-help{font-size:12px;color:var(--muted2);margin-top:4px;line-height:1.5}.br-question-icon{width:34px;height:34px;border:1px solid rgba(124,108,255,.23);background:#14132a;border-radius:10px;display:grid;place-items:center;color:#aaa2ff}
+.stTextArea textarea{background:#090d14!important;color:var(--text)!important;border:1px solid rgba(226,232,240,.10)!important;border-radius:14px!important;min-height:154px!important;font-size:14px!important;line-height:1.6!important;padding:17px!important;box-shadow:inset 0 1px rgba(255,255,255,.025)!important}.stTextArea textarea::placeholder{color:#4f596b!important}.stTextArea textarea:focus{border-color:rgba(124,108,255,.72)!important;box-shadow:0 0 0 3px rgba(124,108,255,.09),inset 0 1px rgba(255,255,255,.04)!important}.stTextArea label,.stSelectbox label,.stFileUploader label{display:none!important}
+.br-metric{padding:15px;border:1px solid var(--line);background:#0d121a;border-radius:13px}.br-metric-value{font-size:19px;font-weight:800;letter-spacing:-.03em}.br-metric-label{font-size:8px;text-transform:uppercase;letter-spacing:.13em;color:#697489;margin-top:5px}.br-metric.indigo{border-color:rgba(124,108,255,.20)}.br-metric.cyan{border-color:rgba(69,214,193,.18)}
+.br-mode-card{min-height:116px;padding:16px;border:1px solid var(--line);background:linear-gradient(145deg,#0e131c,#0b0f16);border-radius:15px;transition:all .2s ease;position:relative;overflow:hidden}.br-mode-card:after{content:"";position:absolute;inset:auto 0 0;height:2px;background:transparent}.br-mode-card:hover{border-color:var(--line2);transform:translateY(-2px)}.br-mode-card.selected{border-color:rgba(124,108,255,.55);background:linear-gradient(145deg,#17162c,#0f131d);box-shadow:0 8px 30px rgba(30,25,80,.18)}.br-mode-card.selected:after{background:linear-gradient(90deg,var(--indigo),var(--cyan))}.br-mode-icon{font-size:17px;color:#aaa2ff;margin-bottom:13px}.br-mode-name{font-size:12px;font-weight:760}.br-mode-desc{font-size:11px;color:#737e91;margin-top:5px;line-height:1.5}
+.br-board-toolbar{display:flex;align-items:center;justify-content:space-between;gap:15px}.br-board-count{color:var(--muted2);font-size:10px}.br-auto{color:#aaa2ff;border:1px solid rgba(124,108,255,.24);background:#14132a;padding:7px 9px;border-radius:999px;font-size:8px;text-transform:uppercase;letter-spacing:.11em;font-weight:800}.br-exec-card{min-height:112px;padding:14px;border:1px solid var(--line);background:linear-gradient(145deg,#0e131c,#0b0f16);border-radius:14px;transition:all .2s ease;position:relative;overflow:hidden}.br-exec-card:before{content:"";position:absolute;left:0;top:0;bottom:0;width:2px;background:#293141}.br-exec-card.selected{border-color:rgba(124,108,255,.42);background:linear-gradient(145deg,#17162c,#10141d)}.br-exec-card.selected:before{background:linear-gradient(180deg,var(--indigo),var(--cyan))}.br-exec-card:hover{border-color:var(--line2);transform:translateY(-2px)}.br-exec-avatar{width:32px;height:32px;border-radius:9px;display:grid;place-items:center;background:#181e29;color:#aeb8ca;font-size:9px;font-weight:850;margin-bottom:12px}.br-exec-card.selected .br-exec-avatar{background:#29244b;color:#c2bcff}.br-exec-name{font-size:11px;font-weight:760}.br-exec-role{color:#8792a5;font-size:11px;margin-top:4px;line-height:1.4}div[data-testid="stCheckbox"]{margin-top:-7px}div[data-testid="stCheckbox"] label{font-size:12px!important;color:#737e90!important}
+.br-evidence{min-height:138px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;border:1px dashed rgba(226,232,240,.13);background:linear-gradient(145deg,#0b1017,#090d13);border-radius:14px;padding:18px}.br-evidence-icon{width:38px;height:38px;display:grid;place-items:center;border-radius:11px;background:#151a25;color:#a79eff;margin-bottom:10px;border:1px solid var(--line)}.br-evidence-title{font-size:12px;font-weight:750}.br-evidence-copy{color:#697488;font-size:9px;margin-top:5px;line-height:1.5}section[data-testid="stFileUploaderDropzone"]{background:#0b1017!important;border:1px dashed rgba(226,232,240,.14)!important;border-radius:14px!important}section[data-testid="stFileUploaderDropzone"] button{border-radius:9px!important}
+.br-launch{margin-top:19px;padding:17px 18px;border:1px solid rgba(124,108,255,.25);background:linear-gradient(100deg,rgba(124,108,255,.11),rgba(69,214,193,.035));border-radius:15px;display:flex;align-items:center;justify-content:space-between;gap:20px}.br-launch-label{font-size:8px;text-transform:uppercase;letter-spacing:.16em;color:#7e8798}.br-launch-main{font-size:13px;font-weight:720;margin-top:4px;color:#dce0e8}.stButton>button,.stFormSubmitButton>button{min-height:45px;border-radius:11px!important;border:1px solid rgba(155,145,255,.35)!important;background:linear-gradient(135deg,#7869f4,#8e7dff)!important;color:#fff!important;font-weight:800!important;letter-spacing:.01em;box-shadow:0 9px 25px rgba(84,70,190,.22)!important;transition:all .2s ease}.stButton>button:hover{background:linear-gradient(135deg,#897bff,#9b8eff)!important;transform:translateY(-1px);box-shadow:0 13px 30px rgba(84,70,190,.28)!important}
+.br-result-hero{padding:27px;border:1px solid rgba(124,108,255,.28);background:radial-gradient(500px 180px at 88% 0%,rgba(124,108,255,.15),transparent 65%),linear-gradient(145deg,#14182a,#0d121a);border-radius:20px;position:relative;overflow:hidden}.br-result-hero:after{content:"";position:absolute;right:0;top:0;width:2px;height:100%;background:linear-gradient(180deg,var(--indigo),transparent)}.br-result-kicker{color:#aaa2ff;font-size:9px;text-transform:uppercase;letter-spacing:.17em;font-weight:850}.br-result-title{font-size:29px;letter-spacing:-.045em;font-weight:800;margin-top:8px}.br-result-text{color:#aeb6c5;font-size:13px;line-height:1.7;max-width:920px;margin-top:9px;white-space:pre-wrap}.br-result-meta{display:flex;flex-wrap:wrap;gap:7px;margin-top:17px}.br-result-chip{border:1px solid var(--line);background:#0b1017;color:#919bad;padding:7px 10px;border-radius:999px;font-size:9px}.br-tab-note{color:#7d8799;font-size:10px;margin-bottom:13px}.stExpander{border:1px solid var(--line)!important;background:#0d121a!important;border-radius:13px!important}.stExpander summary:hover{background:#111722!important}
+.br-section-rule{height:1px;background:linear-gradient(90deg,var(--line),transparent);margin:7px 0 0}.br-micro{font-size:11px;color:#667184}.br-quick{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}.br-quick span{font-size:10px;color:#8b95a7;border:1px solid var(--line);background:#0d121a;border-radius:999px;padding:6px 9px}
+
+/* Native Streamlit controls made to match the product UI */
+div[data-baseweb="select"]>div{background:#0d121a!important;border:1px solid rgba(226,232,240,.10)!important;border-radius:11px!important;min-height:42px!important}div[data-baseweb="select"] span{color:#eef1f7!important;font-size:13px!important}div[role="listbox"]{background:#101620!important;border:1px solid rgba(226,232,240,.10)!important;border-radius:10px!important}div[role="option"]{color:#dce2eb!important;font-size:13px!important}div[role="option"]:hover{background:#181f2b!important}div[data-testid="stRadio"]>div[role="radiogroup"]{gap:7px!important;flex-wrap:wrap!important}div[data-testid="stRadio"]>div[role="radiogroup"]>label{border:1px solid rgba(226,232,240,.09)!important;background:#0d121a!important;border-radius:10px!important;padding:8px 12px!important;min-height:38px!important;transition:.18s ease!important}div[data-testid="stRadio"]>div[role="radiogroup"]>label:hover{border-color:rgba(124,108,255,.35)!important;background:#131925!important}div[data-testid="stRadio"]>div[role="radiogroup"]>label:has(input:checked){border-color:rgba(124,108,255,.55)!important;background:#18162b!important;box-shadow:inset 0 0 0 1px rgba(124,108,255,.08)!important}div[data-testid="stRadio"]>div[role="radiogroup"]>label p{font-size:12px!important;color:#d9deea!important}div[data-testid="stRadio"] input{accent-color:#7c6cff!important}
+/* V3 interaction + readability pass */
+.br-mode-card,.br-exec-card,.br-panel,.br-metric,.br-evidence{will-change:transform}
+.br-mode-card:focus-within,.br-exec-card:focus-within{outline:2px solid rgba(124,108,255,.6);outline-offset:2px}
+.br-mode-card.selected .br-mode-icon{color:#45d6c1}
+.br-launch{position:relative;overflow:hidden}.br-launch:before{content:"";position:absolute;left:-20%;top:0;width:20%;height:1px;background:linear-gradient(90deg,transparent,#45d6c1,transparent);animation:brSweep 2.8s linear infinite}@keyframes brSweep{to{left:110%}}
+
+/* V8 processing enhancements */
+.br-process-shell{position:relative}
+.br-process-shell:before{content:"";position:absolute;inset:0;pointer-events:none;background:
+radial-gradient(420px 220px at 22% 35%,rgba(124,108,255,.12),transparent 70%),
+radial-gradient(360px 220px at 78% 20%,rgba(69,214,193,.08),transparent 72%)}
+.br-process-body{position:relative}
+.br-process-board{background:
+radial-gradient(circle at 50% 50%,rgba(124,108,255,.16),transparent 31%),
+radial-gradient(circle at 50% 50%,rgba(69,214,193,.06),transparent 53%),
+linear-gradient(180deg,#0d121b,#080c13)}
+.br-process-board:after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at center,transparent 0 23%,rgba(124,108,255,.025) 24%,transparent 48%)}
+.br-orbit{border-color:rgba(124,108,255,.22);box-shadow:0 0 35px rgba(124,108,255,.05)}
+.br-orbit.two{border-color:rgba(69,214,193,.12)}
+.br-ceo{box-shadow:0 0 38px rgba(124,108,255,.28),inset 0 1px rgba(255,255,255,.15)!important;background:radial-gradient(circle at 35% 25%,#a69cff,#6454dc 58%,#28215f)!important}
+.br-agent-node{width:78px;height:78px;margin:-39px;background:linear-gradient(145deg,#151c29,#0c1119);box-shadow:inset 0 1px rgba(255,255,255,.05);font-size:11px}
+.br-agent-node.active{border-color:var(--cyan)!important;box-shadow:0 0 0 8px rgba(69,214,193,.07),0 0 35px rgba(69,214,193,.22)}
+.br-agent-node.complete{border-color:rgba(94,224,160,.45);background:linear-gradient(145deg,#10201c,#0d1516)}
+.br-agent-node .agent-dot{width:6px;height:6px;border-radius:50%;display:inline-block;margin-right:4px;background:#657083;vertical-align:middle}
+.br-agent-node.active .agent-dot{background:var(--cyan);box-shadow:0 0 9px var(--cyan);animation:brLive 1s infinite}
+.br-selected-strip{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}
+.br-selected-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 9px;border-radius:999px;border:1px solid rgba(124,108,255,.20);background:rgba(124,108,255,.07);font-size:9px;color:#b9c0cd}
+.br-selected-chip i{width:5px;height:5px;border-radius:50%;background:#788396}
+.br-selected-chip.live{border-color:rgba(69,214,193,.28);background:rgba(69,214,193,.06);color:#bdeee7}
+.br-selected-chip.live i{background:var(--cyan);box-shadow:0 0 8px var(--cyan)}
+.br-selected-chip.done{border-color:rgba(94,224,160,.22);background:rgba(94,224,160,.05);color:#bdebd2}
+.br-selected-chip.done i{background:var(--green)}
+.br-process-side{background:linear-gradient(180deg,rgba(15,20,29,.85),rgba(10,14,21,.95))}
+.br-progress-clock{display:flex;align-items:baseline;gap:7px;margin-top:10px}
+.br-progress-clock .big{font-size:27px;font-weight:820;letter-spacing:-.045em;color:#f5f7fb;font-variant-numeric:tabular-nums}
+.br-progress-clock .unit{font-size:10px;color:#6f7b8f;text-transform:uppercase;letter-spacing:.12em}
+.br-progress-bar{height:5px;border-radius:99px;background:#1c2431;overflow:hidden;margin-top:10px}
+.br-progress-bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--indigo),var(--cyan));border-radius:99px;transition:width .5s ease;box-shadow:0 0 15px rgba(69,214,193,.22)}
+.br-stage-row{min-height:58px}
+.br-stage-row.active{background:linear-gradient(90deg,rgba(69,214,193,.08),rgba(124,108,255,.04));border-color:rgba(69,214,193,.20);box-shadow:inset 3px 0 var(--cyan)}
+.br-stage-row.done{border-color:rgba(94,224,160,.08)}
+.br-stage-name{font-size:12px}
+.br-stage-detail{font-size:10.5px}
+.br-stage-time{font-size:9px;font-variant-numeric:tabular-nums}
+.br-process-footer{font-size:10.5px}
+.br-timeline-label{display:flex;justify-content:space-between;align-items:center;margin-top:15px;font-size:9px;color:#697589;text-transform:uppercase;letter-spacing:.12em}
+.br-timeline-label b{color:#b6bfce;font-size:10px;letter-spacing:0}
+.br-auto-routing{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:190px;text-align:center;z-index:5}
+.br-auto-routing .ring{width:82px;height:82px;margin:0 auto 10px;border-radius:50%;border:1px solid rgba(124,108,255,.35);background:radial-gradient(circle,#242047,#0f1320 70%);display:grid;place-items:center;color:#bcb5ff;box-shadow:0 0 35px rgba(124,108,255,.15);animation:brRoutePulse 1.8s ease-in-out infinite}
+.br-auto-routing .ring span{font-size:10px;font-weight:800;letter-spacing:.08em}
+.br-auto-routing b{display:block;font-size:11px;color:#e8ebf2}
+.br-auto-routing small{display:block;color:#707b8d;font-size:9px;margin-top:4px;line-height:1.45}
+@keyframes brRoutePulse{50%{transform:scale(1.07);box-shadow:0 0 50px rgba(124,108,255,.28)}}
+@media(max-width:900px){.br-progress-clock .big{font-size:23px}}
+
+.br-process-shell{border:1px solid rgba(226,232,240,.09);background:linear-gradient(145deg,#0e141d,#090d14);border-radius:20px;overflow:hidden;margin-top:28px}
+.br-process-head{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:17px 19px;border-bottom:1px solid rgba(226,232,240,.07)}
+.br-process-kicker{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:#7e899b;font-weight:800}.br-process-status{display:flex;align-items:center;gap:8px;color:#8fe7d7;font-size:11px;font-weight:700}.br-process-status i{width:7px;height:7px;border-radius:50%;background:#45d6c1;box-shadow:0 0 0 5px rgba(69,214,193,.07);animation:brLive 1.1s infinite}@keyframes brLive{50%{opacity:.35;transform:scale(.75)}}
+.br-process-body{display:grid;grid-template-columns:1.25fr .75fr;gap:0;min-height:410px}.br-process-board{position:relative;min-height:410px;background:radial-gradient(circle at 50% 50%,rgba(124,108,255,.10),transparent 34%),linear-gradient(180deg,#0d121b,#090d14);overflow:hidden}.br-process-board:before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px);background-size:44px 44px;mask-image:linear-gradient(to bottom,black,transparent 95%)}
+.br-orbit{position:absolute;left:50%;top:50%;width:260px;height:260px;margin:-130px;border:1px solid rgba(124,108,255,.15);border-radius:50%;animation:brOrbit 18s linear infinite}.br-orbit.two{width:360px;height:360px;margin:-180px;border-color:rgba(69,214,193,.07);animation-direction:reverse;animation-duration:25s}@keyframes brOrbit{to{transform:rotate(360deg)}}
+.br-ceo{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:86px;height:86px;border-radius:50%;display:grid;place-items:center;text-align:center;background:radial-gradient(circle at 35% 30%,#9488ff,#31295e 65%,#171529);border:1px solid rgba(160,150,255,.48);box-shadow:0 0 0 10px rgba(124,108,255,.045),0 0 42px rgba(124,108,255,.22);z-index:3}.br-ceo b{font-size:12px}.br-ceo span{display:block;font-size:8px;color:#c8c4e8;letter-spacing:.12em;margin-top:2px}
+.br-agent-node{position:absolute;width:70px;height:70px;margin:-35px;border-radius:50%;display:grid;place-items:center;text-align:center;border:1px solid rgba(226,232,240,.14);background:#111722;color:#c7cfdb;z-index:4;transition:.3s}.br-agent-node b{font-size:10px}.br-agent-node span{display:block;font-size:7px;color:#707c8e;margin-top:3px;letter-spacing:.08em}.br-agent-node.active{border-color:rgba(69,214,193,.7);box-shadow:0 0 0 7px rgba(69,214,193,.055),0 0 28px rgba(69,214,193,.18);transform:scale(1.08)}
+.br-n1{left:50%;top:14%}.br-n2{left:83%;top:35%}.br-n3{left:75%;top:78%}.br-n4{left:25%;top:78%}.br-n5{left:17%;top:35%}
+.br-connection{position:absolute;left:50%;top:50%;height:1px;width:35%;transform-origin:left center;background:linear-gradient(90deg,rgba(124,108,255,.42),transparent);z-index:1}.br-c1{transform:rotate(-90deg)}.br-c2{transform:rotate(-27deg)}.br-c3{transform:rotate(28deg)}.br-c4{transform:rotate(152deg)}.br-c5{transform:rotate(207deg)}
+.br-process-side{border-left:1px solid rgba(226,232,240,.07);padding:18px;display:flex;flex-direction:column}.br-progress-title{font-size:12px;font-weight:760}.br-progress-sub{font-size:11px;color:#768196;line-height:1.5;margin-top:4px}.br-stage-list{display:flex;flex-direction:column;gap:7px;margin-top:17px}.br-stage-row{display:grid;grid-template-columns:22px 1fr auto;align-items:center;gap:9px;padding:10px 9px;border:1px solid transparent;border-radius:11px}.br-stage-row.active{background:#111b21;border-color:rgba(69,214,193,.17)}.br-stage-row.done{background:#0f1519}.br-stage-icon{width:20px;height:20px;border-radius:7px;display:grid;place-items:center;background:#1a202b;color:#697487;font-size:9px}.br-stage-row.active .br-stage-icon{background:rgba(69,214,193,.12);color:#45d6c1;animation:brSpin 1.2s linear infinite}.br-stage-row.done .br-stage-icon{background:rgba(94,224,160,.10);color:#5ee0a0}@keyframes brSpin{to{transform:rotate(360deg)}}.br-stage-name{font-size:11px;font-weight:700}.br-stage-detail{font-size:10px;color:#6f7a8d;margin-top:2px;line-height:1.4}.br-stage-time{font-size:9px;color:#687386}.br-process-footer{margin-top:auto;padding-top:15px;border-top:1px solid rgba(226,232,240,.07);font-size:10px;color:#687386;line-height:1.5}.br-timer{font-variant-numeric:tabular-nums;color:#d7dce5;font-weight:700}
+.br-success-banner{display:flex;align-items:center;gap:12px;padding:14px 16px;border:1px solid rgba(94,224,160,.18);background:rgba(94,224,160,.055);border-radius:14px;margin-top:18px}.br-success-icon{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;background:rgba(94,224,160,.11);color:#5ee0a0}.br-success-title{font-size:12px;font-weight:800}.br-success-copy{font-size:10px;color:#758094;margin-top:3px}
+@media(max-width:900px){.br-process-body{grid-template-columns:1fr}.br-process-side{border-left:0;border-top:1px solid rgba(226,232,240,.07)}.br-process-board{min-height:350px}.br-process-shell{margin-top:22px}}
+
+@media(max-width:900px){.block-container{padding:21px 17px 48px}.br-page-title{font-size:31px}.br-top-actions{display:none}.br-launch{align-items:flex-start;flex-direction:column}}
+</style>
+""", unsafe_allow_html=True)
+
+# Single source of truth for user-facing configuration.
+# The sidebar is intentionally read-only; editable controls live in the
+# main workspace so the same setting is never instantiated twice.
+if "analysis_mode" not in st.session_state:
+    st.session_state["analysis_mode"] = "question_only"
+if "response_mode" not in st.session_state:
+    st.session_state["response_mode"] = "short"
+if "board_selection" not in st.session_state:
+    st.session_state["board_selection"] = "Automatic"
+if "execution_mode" not in st.session_state:
+    st.session_state["execution_mode"] = "accurate"
+
+with st.sidebar:
+    st.markdown('<div class="br-side-brand"><div class="br-side-title">AI Boardroom</div><div class="br-side-caption">Executive decision intelligence</div></div>', unsafe_allow_html=True)
+    st.markdown('<div class="br-side-section">Current session</div>', unsafe_allow_html=True)
+    side_mode = {"question_only":"Decision only","question_with_document":"Decision + evidence","document_only":"Evidence only"}[st.session_state["analysis_mode"]]
+    side_depth = {"short":"Concise","executive_summary":"Executive summary","detailed":"Detailed"}[st.session_state["response_mode"]]
+    side_board = "AI routed" if st.session_state["board_selection"] == "Automatic" else "Custom board"
+    st.markdown(f'<div class="br-side-info"><div style="color:#f4f6fa;font-weight:750;margin-bottom:7px">{side_mode}</div><div style="color:#7d8798">Response · {side_depth}</div><div style="color:#7d8798">Board · {side_board}</div><div style="color:#7d8798">Execution · {st.session_state["execution_mode"].title()}</div></div>', unsafe_allow_html=True)
+    st.markdown('<div class="br-side-section">Navigation</div>', unsafe_allow_html=True)
+    st.markdown('<div class="br-side-info"><span style="color:#c9c4ff">01</span> Decision brief<br><span style="color:#7d8798">02</span> Analysis method<br><span style="color:#7d8798">03</span> Response style<br><span style="color:#7d8798">04</span> Execution mode<br><span style="color:#7d8798">05</span> Evidence<br><span style="color:#7d8798">06</span> Executive board</div>', unsafe_allow_html=True)
+    st.markdown('<div class="br-side-section">System</div>', unsafe_allow_html=True)
+    st.markdown('<div class="br-side-info"><span style="color:#45d6c1">●</span> API connected<br><span style="color:#687386">Multi-agent orchestration</span><br><span style="color:#687386">Local secure session</span></div>', unsafe_allow_html=True)
+
+st.markdown('<div class="br-topbar"><div class="br-brand"><div class="br-mark">◈</div><div><div class="br-brand-title">AI Boardroom</div><div class="br-brand-sub">Executive decision intelligence</div></div></div><div class="br-top-actions"><div class="br-pill"><span class="br-live-dot"></span> Systems operational</div><div class="br-pill">Private session</div></div></div>', unsafe_allow_html=True)
+st.markdown('<div class="br-hero"><div class="br-eyebrow">Decision intelligence · New session</div><div class="br-page-title">Put the decision in the room.</div><div class="br-page-sub">Give your virtual executive team the decision, context and evidence. AI assembles the right board, challenges assumptions, surfaces trade-offs and produces a CEO-level recommendation.</div></div>', unsafe_allow_html=True)
+
+st.markdown('<div class="br-section-label">01 · Decision brief</div>', unsafe_allow_html=True)
+col_main, col_side = st.columns([1.72,.78], gap="large")
+with col_main:
+    st.markdown('<div class="br-panel"><div class="br-panel-inner"><div class="br-question-head"><div><div class="br-question-title">What should the board decide?</div><div class="br-question-help">Frame the decision as a clear outcome. Include market, financial or operational context if relevant.</div></div><div class="br-question-icon">◎</div></div>', unsafe_allow_html=True)
+    question = st.text_area("Business question", placeholder="Example: Should we launch the product in the European market in Q2?", height=154, key="business_question")
+    st.markdown('<div class="br-quick"><span>Launch decision</span><span>Market expansion</span><span>Hiring plan</span><span>Investment case</span><span>Product strategy</span></div></div></div>', unsafe_allow_html=True)
+with col_side:
+    depth = {"short":"Concise","executive_summary":"Executive","detailed":"Deep"}[st.session_state["response_mode"]]
+    board_type = "AI routed" if st.session_state["board_selection"] == "Automatic" else "Custom"
+    st.markdown(f'<div class="br-panel"><div class="br-panel-inner"><div class="br-question-title">Session profile</div><div class="br-question-help" style="margin-bottom:14px">Live configuration</div><div class="br-metric indigo"><div class="br-metric-value">{board_type}</div><div class="br-metric-label">Board strategy</div></div><div style="height:7px"></div><div class="br-metric cyan"><div class="br-metric-value">{depth}</div><div class="br-metric-label">Response depth</div></div><div style="height:11px"></div><div class="br-micro">CEO synthesis is always the final layer.</div></div></div>', unsafe_allow_html=True)
+
+st.markdown('<div class="br-section-label">02 · Analysis method</div>', unsafe_allow_html=True)
+mode_labels={"question_only":"Decision only","question_with_document":"Decision + evidence","document_only":"Evidence only"}
+mode = st.radio("Analysis method", ["question_only","question_with_document","document_only"], index=["question_only","question_with_document","document_only"].index(st.session_state["analysis_mode"]), format_func=lambda x: mode_labels[x], horizontal=True, key="analysis_mode", label_visibility="collapsed")
+
+st.markdown('<div class="br-section-label">03 · Response style</div>', unsafe_allow_html=True)
+response_labels={"short":"Concise","executive_summary":"Executive summary","detailed":"Detailed"}
+response_mode = st.radio("Response depth", ["short","executive_summary","detailed"], index=["short","executive_summary","detailed"].index(st.session_state["response_mode"]), format_func=lambda x: response_labels[x], horizontal=True, key="response_mode", label_visibility="collapsed")
+mode_icons={"question_only":"◎","question_with_document":"▣","document_only":"◫"}; mode_desc={"question_only":"Reason from the decision and executive expertise.","question_with_document":"Combine the decision with supporting source material.","document_only":"Interrogate the supplied document and extract implications."}
+mc=st.columns(3,gap="small")
+for i,m in enumerate(["question_only","question_with_document","document_only"]):
+    with mc[i]:
+        st.markdown(f'<div class="br-mode-card {"selected" if m==mode else ""}"><div class="br-mode-icon">{mode_icons[m]}</div><div class="br-mode-name">{mode_labels[m]}</div><div class="br-mode-desc">{mode_desc[m]}</div></div>', unsafe_allow_html=True)
+
+uploaded_file=None
+st.markdown('<div class="br-section-label">04 · Execution mode</div>', unsafe_allow_html=True)
+execution_labels = {"accurate": "Accurate", "fast": "Fast"}
+execution_mode = st.radio(
+    "Execution mode",
+    ["accurate", "fast"],
+    index=["accurate", "fast"].index(st.session_state["execution_mode"]),
+    format_func=lambda x: execution_labels[x],
+    horizontal=True,
+    key="execution_mode",
+    label_visibility="collapsed",
+)
+execution_desc = {
+    "accurate": "Full agent prompts and response budgets for maximum reasoning depth.",
+    "fast": "Compact agent prompts and reduced budgets for faster boardroom analysis.",
+}
+st.markdown(
+    f'<div class="br-panel"><div class="br-panel-inner"><div class="br-question-title">{execution_labels[execution_mode]} execution</div>'
+    f'<div class="br-question-help">{execution_desc[execution_mode]}</div></div></div>',
+    unsafe_allow_html=True,
+)
+
+st.markdown('<div class="br-section-label">05 · Evidence layer</div>', unsafe_allow_html=True)
+if mode in {"question_with_document","document_only"}:
+    e1,e2=st.columns([1.3,.7],gap="large")
+    with e1:
+        uploaded_file=st.file_uploader("Upload evidence",type=["pdf","docx","pptx","txt"],label_visibility="collapsed")
+    with e2:
+        st.markdown('<div class="br-panel"><div class="br-panel-inner"><div class="br-question-title">Evidence intelligence</div><div class="br-question-help">The board will ground its reasoning in the uploaded material before forming its recommendation.</div><div style="height:14px"></div><div class="br-micro">Supported · PDF · DOCX · PPTX · TXT</div></div></div>',unsafe_allow_html=True)
+else:
+    st.markdown('<div class="br-panel"><div class="br-panel-inner"><div class="br-evidence"><div class="br-evidence-icon">＋</div><div class="br-evidence-title">No evidence layer</div><div class="br-evidence-copy">Keep this decision expertise-led, or switch to Decision + evidence when source material matters.</div></div></div></div>', unsafe_allow_html=True)
+
+st.markdown('<div class="br-section-label">06 · Executive board</div>', unsafe_allow_html=True)
+selection_mode = st.radio("Board selection", ["Automatic", "Manual"], index=["Automatic", "Manual"].index(st.session_state["board_selection"]), horizontal=True, key="board_selection", label_visibility="collapsed")
+manual_selected_agents=[]
+if selection_mode=="Automatic":
+    st.markdown('<div class="br-panel"><div class="br-panel-inner"><div class="br-board-toolbar"><div><div class="br-question-title">AI-selected executive board</div><div class="br-question-help">The system routes the decision to the most relevant specialists, then the CEO synthesizes their perspectives.</div></div><div class="br-auto">Adaptive routing</div></div><div class="br-section-rule"></div></div></div>',unsafe_allow_html=True)
+else:
+    st.markdown('<div class="br-panel"><div class="br-panel-inner"><div class="br-board-toolbar"><div><div class="br-question-title">Build your executive board</div><div class="br-question-help">Choose the perspectives you want to challenge the decision.</div></div><div class="br-board-count">CEO always included</div></div><div class="br-section-rule"></div></div></div>',unsafe_allow_html=True)
+    ids=list(AVAILABLE_AGENTS.keys())
+    for start in range(0,len(ids),5):
+        cols=st.columns(5,gap="small")
+        for i,agent_id in enumerate(ids[start:start+5]):
+            short,role,icon=AGENT_META[agent_id]
+            with cols[i]:
+                checked=st.checkbox("On board",key=f"manual_agent_{agent_id}")
+                if checked: manual_selected_agents.append(agent_id)
+                st.markdown(f'<div class="br-exec-card {"selected" if checked else ""}"><div class="br-exec-avatar">{short if len(short)<5 else icon}</div><div class="br-exec-name">{short}</div><div class="br-exec-role">{role}</div></div>',unsafe_allow_html=True)
+
+st.markdown('<div class="br-launch"><div><div class="br-launch-label">Boardroom ready</div><div class="br-launch-main">Convene the board to challenge the decision, debate trade-offs and synthesize a recommendation.</div></div></div>',unsafe_allow_html=True)
+analyze=st.button("Convene Board  →",type="primary",use_container_width=True)
+
+# ============================================================
+# BOARDROOM VISUALIZATION
+# ("Mission Control" — live pipeline rail, data-flow links,
+#  waveform-speaking indicators and a typewriter transcript,
+#  all driven by the real API response)
+# ============================================================
+
+BOARDROOM_HTML_TEMPLATE = r"""
+<div id="bw-root">
+  <style>
+    #bw-root {
+      position: relative;
+      width: 100%;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      color: #e8e8f0;
+    }
+
+    /* ---------- pipeline rail ---------- */
+    .bw-rail {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background:linear-gradient(180deg,#10151e,#0c1118);
+      border:1px solid rgba(226,232,240,.08);
+      border-radius: 12px;
+      padding: 14px 22px;
+      margin-bottom: 12px;
+    }
+    .bw-step {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12.5px;
+      color:#748096;
+      flex: 1;
+      position: relative;
+    }
+    .bw-step .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background:#2a3241;
+      flex-shrink: 0;
+      transition: all 0.4s ease;
+    }
+    .bw-step.active { color:#d5d1ff; }
+    .bw-step.active .dot {
+      background:#7c6cff;
+      box-shadow:0 0 14px 3px rgba(124,108,255,.48);
+      animation: bwDotPulse 1s ease-in-out infinite;
+    }
+    .bw-step.done { color: #8f9; }
+    .bw-step.done .dot { background:#45d6c1; box-shadow: none; }
+    @keyframes bwDotPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.4); }
+    }
+    .bw-step:not(:last-child)::after {
+      content: "";
+      position: absolute;
+      right: -50%;
+      top: 4px;
+      width: 100%;
+      height: 1px;
+      background:rgba(226,232,240,.08);
+      z-index: -1;
+    }
+
+    /* ---------- main stage layout ---------- */
+    .bw-main {
+      display: flex;
+      gap: 12px;
+      height: 620px;
+    }
+    #bw-stage-wrap {
+      position: relative;
+      flex: 0 0 62%;
+      background:
+        radial-gradient(circle at 50% 45%, #151b26 0%, #090a10 70%),
+        repeating-linear-gradient(0deg, rgba(226,232,240,.025) 0px, rgba(226,232,240,.025) 1px, transparent 1px, transparent 40px),
+        repeating-linear-gradient(90deg, rgba(226,232,240,.025) 0px, rgba(226,232,240,.025) 1px, transparent 1px, transparent 40px);
+      border-radius: 16px;
+      overflow: hidden;
+      border:1px solid rgba(226,232,240,.07);
+    }
+    #bw-stage { position: absolute; inset: 0; }
+
+    .bw-core {
+      position: absolute;
+      left: 50%; top: 50%;
+      width: 90px; height: 90px;
+      margin-left: -45px; margin-top: -45px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #6c63ff 0%, #2a2470 70%, transparent 100%);
+      box-shadow: 0 0 30px 6px rgba(124,108,255,.24);
+      transition: all 0.6s ease;
+      z-index: 5;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10.5px; font-weight: 700; letter-spacing: 1px; color: #fff;
+      text-align: center;
+    }
+    .bw-core.pulse { animation: bwPulse 1.4s ease-in-out infinite; }
+    @keyframes bwPulse {
+      0%, 100% { box-shadow: 0 0 30px 6px rgba(124,108,255,.24); }
+      50% { box-shadow: 0 0 55px 18px rgba(124,108,255,.42); }
+    }
+
+    .bw-shockwave {
+      position: absolute; left: 50%; top: 50%;
+      width: 20px; height: 20px; margin-left: -10px; margin-top: -10px;
+      border-radius: 50%; border: 2px solid rgba(124,108,255,.55);
+      opacity: 0; z-index: 3;
+    }
+    .bw-shockwave.fire { animation: bwWave 1.1s ease-out forwards; }
+    @keyframes bwWave {
+      0% { width: 20px; height: 20px; margin-left: -10px; margin-top: -10px; opacity: 0.9; }
+      100% { width: 520px; height: 520px; margin-left: -260px; margin-top: -260px; opacity: 0; }
+    }
+
+    svg#bw-links { position: absolute; inset: 0; z-index: 4; pointer-events: none; }
+    .bw-link {
+      stroke-dasharray: 6 6;
+      fill: none;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+    .bw-link.on { opacity: 0.65; animation: bwFlow 0.7s linear infinite; }
+    @keyframes bwFlow { to { stroke-dashoffset: -24; } }
+
+    .bw-particle {
+      position: absolute;
+      width: 64px; height: 64px;
+      margin-left: -32px; margin-top: -32px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 12px; letter-spacing: 0.4px;
+      cursor: pointer;
+      opacity: 0.32; transform: scale(0.85);
+      transition: left 1.4s cubic-bezier(.4,0,.2,1), top 1.4s cubic-bezier(.4,0,.2,1),
+                  opacity 0.5s ease, transform 0.5s ease;
+      z-index: 6;
+      border: 2px solid rgba(255,255,255,0.15);
+    }
+    .bw-particle::before { content:""; position:absolute; inset:4px; border:1px solid rgba(255,255,255,.10); border-radius:inherit; pointer-events:none; }
+    .bw-agent-code { font-size:11px; font-weight:850; letter-spacing:.08em; }
+    .bw-agent-state { position:absolute; bottom:-17px; font-size:7px; letter-spacing:.12em; color:#687386; white-space:nowrap; }
+    .bw-particle:focus-visible { outline:2px solid #9b91ff; outline-offset:4px; }
+    .bw-particle.active .bw-agent-state { color:#45d6c1; }
+    .bw-particle.active { opacity: 1; transform: scale(1.08); }
+    .bw-particle.collapsed { opacity: 0; transform: scale(0.2); }
+
+    .bw-wave-bars {
+      position: absolute;
+      display: flex; align-items: flex-end; gap: 2px;
+      height: 14px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      z-index: 7;
+    }
+    .bw-wave-bars.on { opacity: 1; }
+    .bw-wave-bars span {
+      width: 2.5px;
+      background: currentColor;
+      border-radius: 2px;
+      animation: bwBar 0.6s ease-in-out infinite;
+    }
+    .bw-wave-bars span:nth-child(1) { animation-delay: 0s; height: 5px; }
+    .bw-wave-bars span:nth-child(2) { animation-delay: 0.1s; height: 10px; }
+    .bw-wave-bars span:nth-child(3) { animation-delay: 0.2s; height: 14px; }
+    .bw-wave-bars span:nth-child(4) { animation-delay: 0.3s; height: 8px; }
+    .bw-wave-bars span:nth-child(5) { animation-delay: 0.4s; height: 12px; }
+    @keyframes bwBar {
+      0%, 100% { transform: scaleY(0.4); }
+      50% { transform: scaleY(1); }
+    }
+
+    .bw-decision {
+      position: absolute; left: 50%; top: 50%;
+      transform: translate(-50%, -50%) scale(0.4);
+      width: 70%; max-height: 72%;
+      overflow-y: auto;
+      background:rgba(12,16,24,.98);
+      border:1px solid rgba(124,108,255,.35);
+      box-shadow:0 18px 60px rgba(0,0,0,.35);
+      border-radius: 14px;
+      padding: 20px 24px;
+      opacity: 0;
+      transition: all 0.9s cubic-bezier(.2,.8,.2,1);
+      z-index: 15;
+    }
+    .bw-decision.show { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    .bw-decision h4 {
+      margin: 0 0 8px 0; color:#aaa2ff; font-size: 13px;
+      letter-spacing: 0.5px; text-transform: uppercase;
+    }
+    .bw-decision p { margin: 0; font-size: 14px; line-height: 1.55; white-space: pre-wrap; }
+    .bw-cursor { display: inline-block; width: 7px; background: #9d97ff; animation: bwBlink 0.8s steps(1) infinite; }
+    @keyframes bwBlink { 50% { opacity: 0; } }
+
+    .bw-controls { position: absolute; top: 12px; right: 14px; z-index: 30; display: flex; gap: 8px; }
+    .bw-replay {
+      background:#15132a;
+      border:1px solid rgba(124,108,255,.35);
+      color:#d5d1ff; border-radius: 8px;
+      padding: 6px 12px; font-size: 12px; cursor: pointer;
+    }
+    .bw-replay:hover { background:#201c3d; }
+    .bw-hint { position: absolute; bottom: 10px; left: 16px; font-size: 10.5px; opacity:0.55;z-index:4; }
+
+    /* ---------- live transcript feed ---------- */
+    #bw-feed {
+      flex: 1;
+      background:linear-gradient(180deg,#10151e,#0c1118);
+      border:1px solid rgba(226,232,240,.08);
+      border-radius: 16px;
+      padding: 14px;
+      overflow-y: auto;
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    #bw-feed h5 {
+      margin: 0 0 4px 0; font-size: 11.5px; letter-spacing: 1px;
+      color:#748096; text-transform: uppercase;
+    }
+    .bw-feed-item {
+      background: var(--card, #171923);
+      border:1px solid rgba(226,232,240,.07);
+      border-left: 3px solid #444;
+      border-radius: 8px;
+      padding: 9px 11px;
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity 0.4s ease, transform 0.4s ease, border-color 0.3s ease;
+    }
+    .bw-feed-item.show { opacity: 1; transform: translateY(0); }
+    .bw-feed-item.flash { border-left-color: #fff !important; }
+    .bw-feed-item .role { font-size: 11.5px; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 3px; }
+    .bw-feed-item .txt { font-size: 12.3px; line-height: 1.45; color:#c3cad7; }
+  </style>
+
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin:0 2px 9px;color:#748096;font-size:10px;letter-spacing:.05em;">
+    <span>LIVE EXECUTIVE ORCHESTRATION</span><span style="color:#45d6c1">● PROCESSING</span>
+  </div>
+  <div class="bw-rail" id="bw-rail">
+    <div class="bw-step" data-step="0"><span class="dot"></span>Ingest</div>
+    <div class="bw-step" data-step="1"><span class="dot"></span>Route Executives</div>
+    <div class="bw-step" data-step="2"><span class="dot"></span>Debate</div>
+    <div class="bw-step" data-step="3"><span class="dot"></span>Synthesize</div>
+    <div class="bw-step" data-step="4"><span class="dot"></span>Decision</div>
+  </div>
+
+  <div class="bw-main">
+    <div id="bw-stage-wrap">
+      <div class="bw-controls"><button class="bw-replay" onclick="bwStart()">↻ Replay</button></div>
+      <div class="bw-hint">click an executive to jump to their entry →</div>
+      <div id="bw-stage">
+        <svg id="bw-links"></svg>
+        <div class="bw-shockwave" id="bw-wave"></div>
+        <div class="bw-core" id="bw-core">CEO<br/>CORE</div>
+        <div class="bw-decision" id="bw-decision">
+          <h4>CEO Final Decision</h4>
+          <p id="bw-decision-text"></p>
+        </div>
+      </div>
+    </div>
+    <div id="bw-feed">
+      <h5>Live Transcript</h5>
+      <div id="bw-feed-list"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  const AGENTS = __AGENTS_JSON__;
+  const FINAL_DECISION = __FINAL_DECISION_JSON__;
+  const PALETTE = ["#8b7cff","#45d6c1","#5ca8ff","#f4c15d","#ff718f","#9b91ff","#6fd6ff","#7dd3a8","#c084fc","#94a3b8"];
+  const NS = "http://www.w3.org/2000/svg";
+
+  const stageWrap = document.getElementById("bw-stage-wrap");
+  const stage = document.getElementById("bw-stage");
+  const core = document.getElementById("bw-core");
+  const wave = document.getElementById("bw-wave");
+  const linksSvg = document.getElementById("bw-links");
+  const decisionBox = document.getElementById("bw-decision");
+  const decisionText = document.getElementById("bw-decision-text");
+  const feedList = document.getElementById("bw-feed-list");
+  const railSteps = document.querySelectorAll(".bw-step");
+
+  let particles = [];
+  let timers = [];
+
+  function setStage(idx) {
+    railSteps.forEach(s => {
+      const n = parseInt(s.dataset.step, 10);
+      s.classList.toggle("done", n < idx);
+      s.classList.toggle("active", n === idx);
+    });
+  }
+
+  function clearDynamic() {
+    document.querySelectorAll(".bw-particle, .bw-wave-bars, .bw-feed-item").forEach(el => el.remove());
+    linksSvg.innerHTML = "";
+    feedList.innerHTML = "";
+    particles = [];
+    timers.forEach(t => clearTimeout(t));
+    timers.forEach(t => clearInterval(t));
+    timers = [];
+    core.classList.remove("pulse");
+    wave.classList.remove("fire");
+    decisionBox.classList.remove("show");
+    decisionText.textContent = "";
+    setStage(0);
+  }
+
+  function typeInto(el, text, durationMs, onDone) {
+    let i = 0;
+    const step = Math.max(6, durationMs / Math.max(text.length, 1));
+    const cursor = document.createElement("span");
+    cursor.className = "bw-cursor";
+    cursor.textContent = "\u00a0";
+    const id = setInterval(() => {
+      i++;
+      el.textContent = text.slice(0, i);
+      if (i >= text.length) {
+        clearInterval(id);
+        if (onDone) onDone();
+      }
+    }, step);
+    timers.push(id);
+  }
+
+  function buildParticles() {
+    const cx = stage.clientWidth / 2;
+    const cy = stage.clientHeight / 2;
+    const radius = Math.min(cx, cy) - 70;
+    const n = AGENTS.length;
+
+    AGENTS.forEach((agent, i) => {
+      const angle = (i / n) * Math.PI * 2 - Math.PI / 2;
+      const x = cx + radius * Math.cos(angle);
+      const y = cy + radius * Math.sin(angle);
+      const color = PALETTE[i % PALETTE.length];
+
+      const p = document.createElement("div");
+      p.className = "bw-particle";
+      p.style.left = x + "px";
+      p.style.top = y + "px";
+      p.style.background = "radial-gradient(circle, " + color + "55 0%, " + color + "22 70%)";
+      p.style.color = color;
+      p.innerHTML = '<span class="bw-agent-code">' + agent.name.toUpperCase() + '</span><span class="bw-agent-state">READY</span>';
+      p.setAttribute("role", "button");
+      p.setAttribute("tabindex", "0");
+      p.setAttribute("aria-label", agent.name.toUpperCase() + " executive analysis");
+      p.onclick = () => {
+        const item = document.getElementById("bw-feed-" + i);
+        if (item) {
+          item.scrollIntoView({behavior: "smooth", block: "center"});
+          item.classList.add("flash");
+          setTimeout(() => item.classList.remove("flash"), 700);
+        }
+      };
+      p.onkeydown = (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); p.click(); } };
+      stage.appendChild(p);
+
+      const bars = document.createElement("div");
+      bars.className = "bw-wave-bars";
+      bars.style.left = (x - 9) + "px";
+      bars.style.top = (y + 26) + "px";
+      bars.style.color = color;
+      for (let b = 0; b < 5; b++) bars.appendChild(document.createElement("span"));
+      stage.appendChild(bars);
+
+      const link = document.createElementNS(NS, "line");
+      link.setAttribute("class", "bw-link");
+      link.setAttribute("x1", cx); link.setAttribute("y1", cy);
+      link.setAttribute("x2", x); link.setAttribute("y2", y);
+      link.setAttribute("stroke", color);
+      linksSvg.appendChild(link);
+
+      const feedItem = document.createElement("div");
+      feedItem.className = "bw-feed-item";
+      feedItem.id = "bw-feed-" + i;
+      feedItem.style.borderLeftColor = color + "88";
+      feedItem.innerHTML = '<div class="role" style="color:' + color + '">' + agent.name.toUpperCase() + '</div><div class="txt"></div>';
+      feedList.appendChild(feedItem);
+
+      particles.push({el: p, bars: bars, link: link, feedItem: feedItem, cx: cx, cy: cy, agent: agent, color: color});
+    });
+  }
+
+  window.bwStart = function() {
+    clearDynamic();
+    buildParticles();
+    setStage(0);
+
+    timers.push(setTimeout(() => {
+      setStage(1);
+      wave.classList.add("fire");
+    }, 250));
+
+    const wakeStart = 900;
+    const perAgentGap = 420;
+    const typeDuration = 1300;
+
+    timers.push(setTimeout(() => setStage(2), wakeStart));
+
+    particles.forEach((p, i) => {
+      timers.push(setTimeout(() => {
+        p.el.classList.add("active");
+        p.bars.classList.add("on");
+        p.link.classList.add("on");
+        p.feedItem.classList.add("show");
+        typeInto(p.feedItem.querySelector(".txt"), p.agent.snippet, typeDuration);
+      }, wakeStart + i * perAgentGap));
+    });
+
+    const wakeDone = wakeStart + particles.length * perAgentGap + typeDuration + 400;
+
+    timers.push(setTimeout(() => {
+      setStage(3);
+      core.classList.add("pulse");
+      particles.forEach(p => {
+        p.el.style.left = p.cx + "px";
+        p.el.style.top = p.cy + "px";
+        p.bars.classList.remove("on");
+        p.link.classList.remove("on");
+      });
+    }, wakeDone));
+
+    timers.push(setTimeout(() => {
+      particles.forEach(p => p.el.classList.add("collapsed"));
+      core.classList.remove("pulse");
+      core.style.transform = "scale(1.6)";
+      core.style.opacity = "0.15";
+    }, wakeDone + 1600));
+
+    timers.push(setTimeout(() => {
+      setStage(4);
+      decisionBox.classList.add("show");
+      typeInto(decisionText, FINAL_DECISION, 1400);
+    }, wakeDone + 2100));
+  };
+
+  bwStart();
+})();
+</script>
+"""
+
+
+def render_boardroom_visualization(
+    selected_agents,
+    executive_analyses,
+    final_decision,
+):
+    """
+    Renders the 'Mission Control' boardroom: a pipeline rail
+    (Ingest -> Route -> Debate -> Synthesize -> Decision), a
+    physics-style stage where each executive's particle wakes,
+    speaks (waveform + flowing data-link to the CEO core), then
+    converges and collapses into the final decision -- alongside
+    a live typewriter transcript of what each executive actually
+    said, pulled from the real API response.
+    """
+
+    agents_payload = []
+
+    for agent_id in selected_agents:
+
+        full_text = str(
+            executive_analyses.get(agent_id, "No analysis returned.")
+        )
+
+        snippet = full_text.strip().replace("\n", " ")
+
+        if len(snippet) > 420:
+            snippet = snippet[:420].rstrip() + "…"
+
+        agents_payload.append(
+            {
+                "name": agent_id,
+                "snippet": snippet if snippet else "No analysis returned.",
+            }
+        )
+
+    html = BOARDROOM_HTML_TEMPLATE.replace(
+        "__AGENTS_JSON__", json.dumps(agents_payload)
+    ).replace(
+        "__FINAL_DECISION_JSON__",
+        json.dumps(final_decision or "No final decision was returned."),
+    )
+
+    components.html(html, height=760, scrolling=False)
+
+
+
+# ============================================================
+# EXECUTE BOARDROOM
+# ============================================================
+
+if analyze:
+
+    if mode in {
+        "question_only",
+        "question_with_document",
+    }:
+
+        if not question.strip():
+
+            st.error(
+                "Please enter a business question."
+            )
+
+            st.stop()
+
+    if mode in {
+        "question_with_document",
+        "document_only",
+    }:
+
+        if uploaded_file is None:
+
+            st.error(
+                "Please upload a document."
+            )
+
+            st.stop()
+
+    if selection_mode == "Manual":
+
+        if not manual_selected_agents:
+
+            st.error(
+                "Please select at least one "
+                "executive before analyzing."
+            )
+
+            st.stop()
+
+    data = {
+        "mode": mode,
+        "response_mode": response_mode,
+        "execution_mode": execution_mode,
+    }
+
+    if question.strip():
+
+        data["question"] = (
+            question.strip()
+        )
+
+    if selection_mode == "Manual":
+
+        data["selected_agents"] = json.dumps(
+            manual_selected_agents
+        )
+
+    files = None
+
+    if uploaded_file is not None:
+
+        files = {
+            "document": (
+                uploaded_file.name,
+                uploaded_file.getvalue(),
+                uploaded_file.type,
+            )
+        }
+
+    def _call_boardroom_api():
+        return requests.post(API_URL, data=data, files=files, timeout=2000)
+
+    def _render_processing(elapsed):
+        # Exact UI-observed request timeline. These timestamps are for the
+        # frontend request lifecycle; true backend agent timestamps require
+        # SSE/WebSocket events from FastAPI.
+        phases = [
+            (0.0, "Understanding", "Parsing the decision brief and preparing context."),
+            (3.5, "Board routing", "Selecting the most relevant executive perspectives."),
+            (8.0, "Executive analysis", "Evaluating the decision from the selected perspectives."),
+            (22.0, "Cross-perspective review", "Comparing trade-offs, risks and competing recommendations."),
+            (38.0, "CEO synthesis", "Condensing the board's findings into a final recommendation."),
+        ]
+        idx = 0
+        for i, (start_at, _, _) in enumerate(phases):
+            if elapsed >= start_at:
+                idx = i
+
+        stage_names = [p[1] for p in phases]
+        details = [p[2] for p in phases]
+        total_visual_window = 50.0
+        progress_pct = min(96, max(4, (elapsed / total_visual_window) * 100))
+
+        stage_rows = []
+        for i, name in enumerate(stage_names):
+            state = "done" if i < idx else "active" if i == idx else ""
+            icon = "✓" if i < idx else "◌" if i == idx else "○"
+            if i < idx:
+                right = f"{phases[i+1][0]:.1f}s"
+            elif i == idx:
+                right = "LIVE"
+            else:
+                right = f"~{phases[i][0]:.0f}s"
+            stage_rows.append(
+                f'<div class="br-stage-row {state}">'
+                f'<div class="br-stage-icon">{icon}</div>'
+                f'<div><div class="br-stage-name">{name}</div>'
+                f'<div class="br-stage-detail">{details[i]}</div></div>'
+                f'<div class="br-stage-time">{right}</div></div>'
+            )
+
+        # Manual selection is known before the API call. Automatic selection
+        # is intentionally not guessed: the backend only returns the actual
+        # selected board when the current non-streaming endpoint completes.
+        if selection_mode == "Manual":
+            loading_agents = list(manual_selected_agents)
+            known_board = True
+        else:
+            loading_agents = []
+            known_board = False
+
+        # Agent activity for a manually selected board.
+        agent_nodes = []
+        if loading_agents:
+            n = len(loading_agents)
+            import math
+            for i, agent_id in enumerate(loading_agents):
+                angle = (i / max(n, 1)) * 2 * math.pi - math.pi / 2
+                radius_x, radius_y = 35, 31
+                x = 50 + radius_x * math.cos(angle)
+                y = 50 + radius_y * math.sin(angle)
+
+                if idx < 2:
+                    status = "ROUTED" if idx == 1 else "READY"
+                    state_class = ""
+                elif idx == 2:
+                    active_agent = loading_agents[int(elapsed - 8.0) // 3 % n]
+                    status = "ANALYZING" if agent_id == active_agent else "QUEUED"
+                    state_class = "active" if agent_id == active_agent else ""
+                elif idx == 3:
+                    status = "REVIEWING"
+                    state_class = "active"
+                else:
+                    status = "SYNTHESIZING"
+                    state_class = ""
+
+                meta = AGENT_META.get(agent_id.lower(), (agent_id.upper(), "Executive", "◈"))
+                label = meta[0]
+                agent_nodes.append(
+                    f'<div class="br-agent-node {state_class}" '
+                    f'style="left:{x:.2f}%;top:{y:.2f}%">'
+                    f'<div><span class="agent-dot"></span><b>{label}</b>'
+                    f'<span>{status}</span></div></div>'
+                )
+        else:
+            # Automatic mode: only show the CEO and a routing state until the
+            # API returns the actual selected_agents list. This avoids inventing
+            # executives that may not actually be on the board.
+            agent_nodes.append(
+                '<div class="br-auto-routing">'
+                '<div class="ring"><span>AI ROUTING</span></div>'
+                '<b>Selecting the board</b>'
+                '<small>The actual executives will appear as soon as the Boardroom API returns its routing result.</small>'
+                '</div>'
+            )
+
+        board_label = (
+            f"{len(loading_agents)} selected executives"
+            if known_board else "AI is selecting the board"
+        )
+
+        chips = []
+        if loading_agents:
+            for agent_id in loading_agents:
+                meta = AGENT_META.get(agent_id.lower(), (agent_id.upper(), "Executive", "◈"))
+                if idx >= 2:
+                    active_agent = loading_agents[int(max(0, elapsed - 8.0)) // 3 % len(loading_agents)]
+                    chip_class = "live" if agent_id == active_agent and idx == 2 else "done" if idx >= 3 else ""
+                else:
+                    chip_class = ""
+                chips.append(
+                    f'<span class="br-selected-chip {chip_class}"><i></i>{meta[0]}</span>'
+                )
+
+        html = f"""<div class="br-process-shell">
+          <div class="br-process-head">
+            <div>
+              <div class="br-process-kicker">Live boardroom orchestration</div>
+              <div style="font-size:16px;font-weight:800;margin-top:4px">The board is in session</div>
+              <div class="br-selected-strip">{''.join(chips) or '<span class="br-selected-chip"><i></i>Routing board...</span>'}</div>
+            </div>
+            <div class="br-process-status"><i></i> PROCESSING</div>
+          </div>
+          <div class="br-process-body">
+            <div class="br-process-board">
+              <div class="br-orbit"></div><div class="br-orbit two"></div>
+              <div class="br-connection br-c1"></div><div class="br-connection br-c2"></div>
+              <div class="br-connection br-c3"></div><div class="br-connection br-c4"></div>
+              <div class="br-connection br-c5"></div>
+              <div class="br-ceo"><div><b>CEO</b><span>{'SYNTHESIS' if idx >= 4 else 'CORE'}</span></div></div>
+              {''.join(agent_nodes)}
+              <div style="position:absolute;left:16px;bottom:14px;z-index:6;color:#667386;font-size:9px;letter-spacing:.12em;text-transform:uppercase">
+                {board_label}
+              </div>
+            </div>
+            <div class="br-process-side">
+              <div class="br-progress-title">Workflow status</div>
+              <div class="br-progress-sub">Frontend-observed request lifecycle</div>
+              <div class="br-progress-clock"><span class="big">{elapsed:05.1f}</span><span class="unit">seconds elapsed</span></div>
+              <div class="br-progress-bar"><i style="width:{progress_pct:.1f}%"></i></div>
+              <div class="br-timeline-label"><span>Timeline</span><b>{stage_names[idx]}</b></div>
+              <div class="br-stage-list">{''.join(stage_rows)}</div>
+              <div class="br-process-footer">
+                The visual timeline tracks the live request in the current Streamlit client. Exact backend agent timestamps require streaming events from the Boardroom API.
+              </div>
+            </div>
+          </div></div>"""
+        return html
+
+    process_placeholder = st.empty()
+    started = time.monotonic()
+    request_started_clock = time.strftime("%H:%M:%S")
+    with ThreadPoolExecutor(max_workers=1) as executor:
+        future = executor.submit(_call_boardroom_api)
+        while not future.done():
+            elapsed = time.monotonic() - started
+            process_placeholder.markdown(_render_processing(elapsed), unsafe_allow_html=True)
+            time.sleep(0.55)
+        request_elapsed = time.monotonic() - started
+        request_finished_clock = time.strftime("%H:%M:%S")
+        try:
+            response = future.result()
+        except requests.exceptions.ConnectionError:
+            process_placeholder.empty()
+            st.error("Could not connect to the AI Boardroom API.")
+            st.info("Make sure FastAPI is running with: python -m uvicorn backend.app.main:app --reload")
+            st.stop()
+        except requests.exceptions.Timeout:
+            process_placeholder.empty()
+            st.error("The Boardroom analysis timed out after 10 minutes.")
+            st.stop()
+        except Exception as exc:
+            process_placeholder.empty()
+            st.error(f"Unexpected error: {exc}")
+            st.stop()
+    process_placeholder.markdown(
+        f'<div class="br-success-banner"><div class="br-success-icon">✓</div>'
+        f'<div><div class="br-success-title">Boardroom analysis received</div>'
+        f'<div class="br-success-copy">Request started {request_started_clock} · completed {request_finished_clock} · total {request_elapsed:.1f}s</div></div></div>',
+        unsafe_allow_html=True,
+    )
+
+    if response.status_code != 200:
+
+        st.error(
+            f"API Error: {response.status_code}"
+        )
+
+        try:
+
+            st.json(
+                response.json()
+            )
+
+        except Exception:
+
+            st.text(
+                response.text
+            )
+
+        st.stop()
+
+    try:
+
+        payload = response.json()
+
+    except Exception:
+
+        st.error(
+            "The API returned an invalid JSON response."
+        )
+
+        st.text(
+            response.text
+        )
+
+        st.stop()
+
+    if payload.get("status") != "success":
+
+        st.error(
+            "Boardroom analysis was not successful."
+        )
+
+        st.json(payload)
+
+        st.stop()
+
+    result = payload.get(
+        "result",
+        {},
+    )
+
+    final_decision = payload.get(
+        "final_decision"
+    )
+
+    selected_agents = result.get(
+        "selected_agents",
+        [],
+    )
+
+    executive_analyses = result.get(
+        "executive_analyses",
+        {},
+    )
+
+    debate = result.get("debate")
+    actual_execution_mode = payload.get("execution_mode", execution_mode)
+
+    # ========================================================
+    # LIVE BOARDROOM (the interactive centerpiece)
+    # ========================================================
+
+    st.markdown(
+        '<div class="section-title">'
+        "🌀 Live Boardroom"
+        "</div>",
+        unsafe_allow_html=True,
+    )
+
+    if selected_agents:
+
+        render_boardroom_visualization(
+            selected_agents,
+            executive_analyses,
+            final_decision,
+        )
+
+    else:
+
+        st.info(
+            "No executives were selected, so there's "
+            "nothing to animate here."
+        )
+
+    
+
+    # ========================================================
+    # DECISION OUTCOME
+    # ========================================================
+    st.markdown('<div class="br-section-label">07 · Board outcome</div>', unsafe_allow_html=True)
+    if final_decision:
+        safe_decision = str(final_decision).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+        st.markdown(f'<div class="br-result-hero"><div class="br-result-kicker">CEO synthesis</div><div class="br-result-title">The board has reached a recommendation.</div><div class="br-result-text">{safe_decision}</div><div class="br-result-meta"><span class="br-result-chip">CEO final decision</span><span class="br-result-chip">{str(actual_execution_mode).upper()} mode</span><span class="br-result-chip">{len(selected_agents)} executives</span><span class="br-result-chip">{result.get("retrieved_chunks",0)} evidence chunks</span></div></div>', unsafe_allow_html=True)
+    else:
+        st.warning("No final decision was returned.")
+
+    st.markdown('<div class="br-section-label">08 · Board intelligence</div>', unsafe_allow_html=True)
+    m1,m2,m3,m4=st.columns(4,gap="small")
+    with m1: st.markdown(f'<div class="br-metric"><div class="br-metric-value">{len(selected_agents)}</div><div class="br-metric-label">Executives</div></div>',unsafe_allow_html=True)
+    with m2: st.markdown(f'<div class="br-metric"><div class="br-metric-value">{result.get("retrieved_chunks",0)}</div><div class="br-metric-label">Evidence chunks</div></div>',unsafe_allow_html=True)
+    with m3: st.markdown(f'<div class="br-metric"><div class="br-metric-value">{str(actual_execution_mode).title()}</div><div class="br-metric-label">Execution mode</div></div>',unsafe_allow_html=True)
+    with m4: st.markdown(f'<div class="br-metric"><div class="br-metric-value">{request_elapsed:.1f}s</div><div class="br-metric-label">Request duration</div></div>',unsafe_allow_html=True)
+
+    tab_board,tab_debate,tab_evidence,tab_technical=st.tabs(["Board reasoning","Executive debate","Evidence","Technical details"])
+    with tab_board:
+        st.markdown('<div class="br-tab-note">Inspect the perspectives that fed the CEO synthesis.</div>',unsafe_allow_html=True)
+        if executive_analyses:
+            for agent_name,analysis in executive_analyses.items():
+                meta=AGENT_META.get(agent_name.lower(),(agent_name.upper(),"Executive","◈"))
+                with st.expander(meta[0] + "  ·  " + meta[1],expanded=False):
+                    st.write(analysis)
+        else: st.info("No executive analyses were returned.")
+    with tab_debate:
+        if debate: st.write(debate)
+        else: st.info("No executive debate was returned.")
+    with tab_evidence:
+        document_name=result.get("document_name")
+        if document_name:
+            st.markdown(f'<div class="br-panel"><div class="br-panel-inner"><div class="br-question-title">{document_name}</div><div class="br-question-help">{result.get("retrieved_chunks",0)} retrieved context chunks were supplied to the board.</div></div></div>',unsafe_allow_html=True)
+        else: st.info("This session did not use an uploaded document.")
+    with tab_technical: st.json(payload)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+###################################################################
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ */
