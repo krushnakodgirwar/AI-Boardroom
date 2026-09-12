@@ -1,8 +1,24 @@
+from pathlib import Path
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 
 from backend.app.api.routes import router
 
+
+# ============================================================
+# PATHS
+# ============================================================
+
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+
+FRONTEND_DIR = BASE_DIR / "frontend"
+
+
+# ============================================================
+# FASTAPI APP
+# ============================================================
 
 app = FastAPI(
     title="AI Boardroom",
@@ -11,7 +27,9 @@ app = FastAPI(
 )
 
 
+# ============================================================
 # CORS
+# ============================================================
 
 app.add_middleware(
     CORSMiddleware,
@@ -27,29 +45,59 @@ app.add_middleware(
 )
 
 
+# ============================================================
 # API ROUTES
+# ============================================================
 
 app.include_router(router)
 
 
-# ROOT
+# ============================================================
+# FRONTEND - LANDING PAGE
+# ============================================================
 
-@app.get("/")
-def root():
+@app.get("/", include_in_schema=False)
+def landing_page():
 
-    return {
-        "project": "AI Boardroom",
-        "status": "running",
-        "version": "1.0.0",
-        "docs": "/docs"
-    }
+    return FileResponse(
+        FRONTEND_DIR / "landingpage.html"
+    )
 
 
+# ============================================================
+# FRONTEND - BOARDROOM PAGE
+# ============================================================
+
+@app.get("/boardroom", include_in_schema=False)
+def boardroom_page():
+
+    return FileResponse(
+        FRONTEND_DIR / "boardroom.html"
+    )
+
+
+# ============================================================
 # HEALTH CHECK
+# ============================================================
 
 @app.get("/health")
 def health():
 
     return {
-        "status": "healthy"
+        "status": "healthy",
+        "project": "AI Boardroom"
+    }
+
+
+# ============================================================
+# PROJECT INFO
+# ============================================================
+
+@app.get("/api/info")
+def project_info():
+
+    return {
+        "project": "AI Boardroom",
+        "version": "1.0.0",
+        "status": "running"
     }
