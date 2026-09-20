@@ -1,662 +1,432 @@
 
-# 🏛️ AI Boardroom OS
-### Where AI Agents Think Together
+<div align="center">
 
-<p align="center">
-  <strong>A Multi-Agent AI Business Decision Simulator</strong><br>
-  Analyze business challenges through specialized AI executives, collaborative reasoning, and structured decision-making.
-</p>
+# 🏛️ AI BOARDROOM OS
+### Multi-Agent AI Business Decision Simulator
 
-<p align="center">
-  <a href="https://ai-boardroom-xexp.onrender.com">
-    <img src="https://img.shields.io/badge/🚀_LIVE_DEMO-Launch_Boardroom-8B5CF6?style=for-the-badge" alt="Live Demo">
-  </a>
-  <a href="https://github.com/krushnakodgirwar/AI-Boardroom">
-    <img src="https://img.shields.io/badge/GitHub-View_Repository-181717?style=for-the-badge&logo=github" alt="GitHub Repository">
-  </a>
-</p>
+**One business challenge. Multiple AI executives. One strategic decision.**
 
-<p align="center">
-  <img src="https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white">
-  <img src="https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white">
-  <img src="https://img.shields.io/badge/PyTorch-EE4C2C?style=flat-square&logo=pytorch&logoColor=white">
-  <img src="https://img.shields.io/badge/Qwen2.5-LLM-7C3AED?style=flat-square">
-  <img src="https://img.shields.io/badge/ChromaDB-Vector_Database-10B981?style=flat-square">
-  <img src="https://img.shields.io/badge/Render-Deployed-46E3B7?style=flat-square">
-</p>
+An AI-powered boardroom where specialized agents analyze business problems, debate strategic options, and synthesize their insights into a unified executive recommendation.
+
+<br/>
+
+[![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-Visit_AI_Boardroom-gold?style=for-the-badge)](https://ai-boardroom-xexp.onrender.com)
+[![GitHub](https://img.shields.io/badge/GitHub-Repository-181717?style=for-the-badge&logo=github)](https://github.com/krushnakodgirwar/AI-Boardroom)
+
+<br/>
+
+![Python](https://img.shields.io/badge/Python-3.x-3776AB?style=flat-square&logo=python&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-Backend-009688?style=flat-square&logo=fastapi)
+![PyTorch](https://img.shields.io/badge/PyTorch-Deep_Learning-EE4C2C?style=flat-square&logo=pytorch)
+![LLM](https://img.shields.io/badge/LLM-Qwen2.5-6C5CE7?style=flat-square)
+![Status](https://img.shields.io/badge/Status-Deployment_Live-brightgreen?style=flat-square)
+
+</div>
 
 ---
 
-## 🌐 Live Application
+## 🌐 Experience the Boardroom
 
-<p align="center">
-  <a href="https://ai-boardroom-xexp.onrender.com">
-    <img src="https://img.shields.io/badge/OPEN_AI_BOARDROOM-Click_to_Explore-111827?style=for-the-badge&logo=googlechrome&logoColor=white">
-  </a>
-</p>
+> **Think like a CEO. Analyze like an executive team. Decide with AI-assisted insights.**
 
-🔗 **Live Website:** https://ai-boardroom-xexp.onrender.com
+🔗 **Live Application:** https://ai-boardroom-xexp.onrender.com
 
-🔗 **GitHub Repository:** https://github.com/krushnakodgirwar/AI-Boardroom
-
-> **Deployment note:** The frontend is hosted on Render. Full AI analysis requires the FastAPI backend to be running and the frontend to be configured with a reachable backend URL.
+📂 **Source Code:** https://github.com/krushnakodgirwar/AI-Boardroom
 
 ---
 
-# 📑 Table of Contents
+## 📌 Table of Contents
 
-<details>
-<summary><strong>📖 Explore the README sections</strong></summary>
-
-- [✨ Introduction](#-introduction)
-- [🎯 Problem Statement](#-problem-statement)
-- [💡 Project Vision](#-project-vision)
-- [🚀 Key Features](#-key-features)
-- [👥 The Executive Board](#-the-executive-board)
-- [⚡ Intelligence Modes](#-intelligence-modes)
-- [🎛️ Agent Selection](#️-agent-selection)
-- [📋 Response Formats](#-response-formats)
-- [🧠 AI Decision Workflow](#-ai-decision-workflow)
-- [🏗️ System Architecture](#️-system-architecture)
-- [🛠️ Technology Stack](#️-technology-stack)
-- [📂 Project Structure](#-project-structure)
-- [⚙️ Installation](#️-installation)
-- [▶️ Run Locally](#️-run-locally)
-- [🔌 API Documentation](#-api-documentation)
-- [☁️ Deployment](#️-deployment)
-- [🧪 Example Scenario](#-example-scenario)
-- [⚠️ Limitations](#️-limitations)
-- [🔮 Future Improvements](#-future-improvements)
-- [👨‍💻 Author](#-author)
-
-</details>
+- [Overview](#-overview)
+- [Why AI Boardroom OS?](#-why-ai-boardroom-os)
+- [Key Features](#-key-features)
+- [Meet the AI Executives](#-meet-the-ai-executives)
+- [How It Works](#-how-it-works)
+- [System Architecture](#-system-architecture)
+- [Technology Stack](#-technology-stack)
+- [Getting Started](#-getting-started)
+- [API Reference](#-api-reference)
+- [Deployment](#-deployment)
+- [Example Use Case](#-example-use-case)
+- [Limitations](#-limitations)
+- [Future Enhancements](#-future-enhancements)
+- [Author](#-author)
 
 ---
 
-# ✨ Introduction
+## 🧠 Overview
 
-**AI Boardroom OS** is a multi-agent AI business decision simulator that explores how specialized AI executives can analyze a business challenge from different professional perspectives.
+**AI Boardroom OS** is a multi-agent business decision simulator designed to explore how AI agents with different executive responsibilities can collaborate on complex business problems.
 
-Rather than relying only on one general-purpose AI response, the system is designed around an executive boardroom workflow.
+Instead of relying on a single AI response, the system brings together specialized executive perspectives.
 
-The backend uses a language model to generate executive analyses, supports agent selection, and can produce a structured CEO-level decision.
+Each selected agent examines the problem through its own business lens. Their insights can then be combined through a structured analysis and executive decision workflow.
 
-The project combines:
+### 🎯 The Core Idea
 
-- 🤖 Specialized executive AI agents
-- 🧠 LLM-powered analysis
-- ⚡ Fast and deep analysis modes
-- 👤 Manual and automatic agent selection
-- 🗣️ Executive debate workflow
-- 🏛️ CEO decision generation
-- ✅ Decision consistency validation
-- 🔎 Retrieval-related components using embeddings and ChromaDB
-- 🌐 A web-based boardroom interface
-
-## 💡 Core Idea
-
-> Multiple AI perspectives → Structured analysis → Executive decision support
-
----
-
-# 🎯 Problem Statement
-
-Business decisions often involve several interconnected areas:
-
-- Financial feasibility
-- Technical feasibility
-- Product-market fit
-- Operational readiness
-- Customer acquisition
-- Legal and regulatory considerations
-- Risk and uncertainty
-- Organizational impact
-
-A single response may not clearly separate these perspectives.
-
-AI Boardroom explores a structured way to organize business analysis through specialized executive roles and a decision-making workflow.
-
----
-
-# 💡 Project Vision
-
-To build an interactive AI environment where users can submit a business challenge and explore it through a simulated executive board.
-
-The system is designed to help users:
-
-| Objective | Description |
+| Traditional AI Chat | AI Boardroom OS |
 |---|---|
-| 🧠 Analyze | Examine a question from relevant executive perspectives |
-| 🔍 Identify gaps | Surface risks and missing information |
-| ⚖️ Compare | Review different considerations and potential disagreements |
-| 📋 Structure | Organize analysis into readable reports |
-| 🏛️ Decide | Generate a CEO-level decision output |
-
-**Important:** AI-generated outputs are decision-support material, not a substitute for professional, legal, financial, or technical review.
+| One AI perspective | Multiple executive perspectives |
+| Single response | Structured analysis workflow |
+| Limited role separation | Specialized executive agents |
+| Direct answer | CEO-style synthesis |
 
 ---
 
-# 🚀 Key Features
+## 💡 Why AI Boardroom OS?
 
-## 🤖 1. Multi-Agent Executive System
+Business decisions often involve competing priorities.
 
-The project uses specialized executive roles to examine business problems from different perspectives.
+A marketing strategy may increase customer acquisition costs. A financial decision may affect product development. A rapid expansion plan may introduce operational and legal risks.
 
-Each selected agent can produce an analysis aligned with its assigned responsibility.
+**AI Boardroom OS explores these trade-offs through a simulated executive team.**
 
-## ⚡ 2. Fast Intelligence
-
-A faster analysis mode designed to obtain insights from relevant executives without requiring the full deep-analysis workflow.
-
-## 🎯 3. Deep Boardroom Analysis
-
-A deeper workflow designed around collaboration between executive agents, including executive analysis, debate, and a CEO-level final decision.
-
-## 👥 4. Automatic Agent Selection
-
-The system can automatically select executives considered relevant to the submitted question.
-
-## 🎛️ 5. Manual Agent Selection
-
-Users can choose which executives should participate.
-
-The interface includes:
-
-- Individual executive selection
-- Select All
-- Clear All
-
-## 📋 6. Multiple Response Formats
-
-The interface supports different response presentation options:
-
-- Short Insight
-- Executive Summary
-- Detailed Analysis
-
-These control the intended level of detail in the response.
-
-## 🏛️ 7. CEO-Level Decision
-
-The backend workflow includes a CEO final-decision stage that uses the executive analyses and available evidence.
-
-## ✅ 8. Decision Validation
-
-The system includes a decision-validation stage that checks the generated CEO decision for consistency with expected decision categories.
-
-## 🔎 9. Retrieval Components
-
-The backend initializes:
-
-- `all-MiniLM-L6-v2` for embeddings
-- ChromaDB for document storage and retrieval-related functionality
-
-The actual evidence available to an analysis depends on the configured retrieval pipeline and supplied context.
-
-## 🌐 10. Web Interface
-
-The project includes a web-based frontend with boardroom configuration, executive selection, analysis progress, and output presentation.
+The project demonstrates how multi-agent AI systems can organize specialized analysis, compare perspectives, and produce a consolidated decision.
 
 ---
 
-# 👥 The Executive Board
+## ✨ Key Features
 
-The project includes executive roles such as the following.
+### 🤖 Multi-Agent Intelligence
+Bring together AI executives with different responsibilities to analyze a shared business challenge.
 
-| Executive | Responsibility |
+### ⚡ Fast Intelligence
+A streamlined analysis mode for users who want a quicker response.
+
+### 🔍 Deep Boardroom Analysis
+A more structured workflow involving executive analysis, discussion, and CEO synthesis.
+
+### 🎛️ Flexible Agent Selection
+Choose specific executive agents manually or use automatic agent selection, depending on the available interface options.
+
+### 🗣️ Multi-Agent Discussion
+Support a simulated debate stage where participating agents can contribute different perspectives.
+
+### 👔 CEO Decision Synthesis
+A CEO-style final stage consolidates the analysis into a unified strategic response.
+
+### 🖥️ Interactive Web Interface
+A browser-based experience for submitting business challenges and interacting with the boardroom workflow.
+
+---
+
+## 👔 Meet the AI Executives
+
+The boardroom is organized around specialized executive roles.
+
+| Executive | Focus Area |
 |---|---|
-| 👑 CEO | Final decision-making and executive synthesis |
-| 💰 CFO | Financial feasibility, costs, revenue, and financial risk |
-| 💻 CTO | Technical feasibility, architecture, and engineering considerations |
-| 📣 CMO | Marketing, positioning, and market communication |
-| ⚙️ COO | Operations, execution, and resource planning |
-| 🎯 CSO | Business strategy and strategic direction |
-| 📦 CPO | Product requirements, customer needs, and product strategy |
-| ⚖️ Legal | Legal and regulatory considerations |
-| 🛡️ Risk Officer | Risk identification and uncertainty |
-| 👥 CHRO | People, workforce, and organizational considerations |
-| 📈 CRO | Revenue generation and commercial growth |
+| 👔 CEO | Final synthesis and strategic direction |
+| 💰 CFO | Finance, budgets, costs, and profitability |
+| 💻 CTO | Technology, architecture, and innovation |
+| 📈 CMO | Marketing, branding, and customer acquisition |
+| ⚙️ COO | Operations, execution, and efficiency |
+| 🎯 CSO | Business strategy and growth |
+| 🧪 CPO | Product development and product strategy |
+| ⚖️ Legal | Legal considerations and compliance |
+| 🛡️ Risk Officer | Risk identification and mitigation |
+| 👥 CHRO | People, hiring, and organizational strategy |
+| 📊 CRO | Revenue generation and commercial growth |
 
-> The interface design and project materials refer to a 10+ executive board. The precise active roster and which roles are independently instantiated depend on the backend configuration. The CEO also appears as the final decision stage in the workflow.
-
----
-
-# ⚡ Intelligence Modes
-
-The frontend provides two intelligence modes.
-
-## ⚡ Fast Intelligence
-
-Designed for rapid insights from relevant executives.
-
-```text
-Business Question
-       ↓
-Executive Selection
-       ↓
-Selected Executive Analysis
-       ↓
-Structured Output
-```
-
-The backend's fast-agent prompt specifies an assessment, key evidence, risks, missing information, recommendation, and confidence.
-
-## 🎯 Deep Boardroom Analysis
-
-Designed for a more extensive executive workflow.
-
-```text
-Business Question
-       ↓
-Executive Selection
-       ↓
-Executive Analysis
-       ↓
-Executive Debate
-       ↓
-CEO Final Decision
-       ↓
-Decision Validation
-       ↓
-Validated Decision
-```
-
-The exact execution behavior depends on the selected agents, analysis mode, and backend implementation.
+*Agent availability and behavior depend on the current application implementation.*
 
 ---
 
-# 🎛️ Agent Selection
+## 🔄 How It Works
 
-Users can choose between automatic and manual executive selection.
-
-## 🤖 Automatic Selection
-
-The backend selects executives based on the submitted business question and its selection logic.
-
-The system records selection information such as the selected executives, selection method, and confidence.
-
-## 👤 Manual Selection
-
-Users choose the executive agents themselves.
-
-The interface provides:
-
-- Select individual agents
-- Select All
-- Clear All
-- Activate Boardroom
-
-The backend logs show that manual selection can pass selected agent identifiers into the analysis workflow.
-
----
-
-# 📋 Response Formats
-
-The interface provides three response-detail options.
-
-| Format | Intended use |
-|---|---|
-| ⚡ Short Insight | Concise output |
-| 📋 Executive Summary | Condensed overview |
-| 📚 Detailed Analysis | More extensive output |
-
-The response format is separate from the intelligence mode: one concerns output detail, while the other concerns the analysis workflow.
-
----
-
-# 🧠 AI Decision Workflow
-
-The backend logs show a staged decision process.
+The system follows a structured decision-making workflow.
 
 ```mermaid
 flowchart TD
-    A["👤 User submits business question"] --> B["🎛️ Configure response and intelligence mode"]
-    B --> C["👥 Select executive agents"]
-    C --> D["🧠 Stage 1: Executive Analysis"]
-    D --> E["🗣️ Stage 2: Executive Debate"]
-    E --> F["👑 Stage 3: CEO Final Decision"]
-    F --> G["✅ Stage 4: CEO Decision Validation"]
-    G --> H["📋 Return decision output"]
+    A([🚀 Start]) --> B[Enter Business Challenge]
+    B --> C{Choose Analysis Mode}
+    C --> D[⚡ Fast Intelligence]
+    C --> E[🔍 Deep Boardroom Analysis]
+
+    D --> F[Generate Analysis]
+    E --> G[Select Executive Agents]
+    G --> H[Parallel Executive Analysis]
+    H --> I{Multiple Agents?}
+
+    I -->|Yes| J[🗣️ Simulated Debate]
+    I -->|No| K[CEO Synthesis]
+    J --> K
+    K --> L[👔 Final Executive Decision]
+    F --> M[Display Results]
+    L --> M
+    M --> N([Complete])
 ```
 
-## Stage 1 — Executive Analysis
+### Workflow Breakdown
 
-Selected executives analyze the question from their assigned perspectives.
+**01 — Submit a Challenge**
 
-The backend supports parallel execution of executive analyses, with logs showing a concurrency limit.
+Enter a business problem, strategic question, or decision scenario.
 
-## Stage 2 — Executive Debate
+**02 — Choose an Analysis Mode**
 
-The workflow can process executive debate.
+Select Fast Intelligence or Deep Boardroom Analysis.
 
-When only one executive is selected, the logs show that redundant debate generation is skipped because no cross-executive disagreement can be established.
+**03 — Select Executive Agents**
 
-## Stage 3 — CEO Final Decision
+Use the available agent-selection controls to configure the boardroom.
 
-The CEO stage generates a final decision using the available executive analyses and evidence.
+**04 — Analyze the Problem**
 
-## Stage 4 — CEO Decision Validation
+Selected agents examine the challenge from their respective business perspectives.
 
-The backend checks the generated decision for consistency.
+**05 — Discuss Strategic Trade-offs**
 
-The logs show checks involving decision categories such as:
+In the deep workflow, participating agents can enter a simulated debate stage.
 
-- Gather more information
-- Pilot
-- Immediate launch
-- Conditional decision
+**06 — Synthesize the Decision**
 
-The final output can include a decision, explanation, and next step.
+The CEO stage consolidates the available insights into a final response.
+
+**07 — Review the Output**
+
+Review the generated analysis and use it as an input to further human evaluation.
 
 ---
 
-# 🏗️ System Architecture
+## 🏗️ System Architecture
+
+The application separates the user-facing interface from the backend analysis workflow.
 
 ```mermaid
 flowchart TB
-    U["👤 User"] --> FE["🌐 Frontend"]
-    FE --> API["⚡ FastAPI Backend"]
+    U[👤 User] --> UI[🌐 Web Interface]
+    UI --> API[⚡ FastAPI Backend]
 
-    API --> CFG["🎛️ Request Configuration"]
-    CFG --> SEL["👥 Executive Selection"]
+    API --> MODE{Analysis Mode}
 
-    SEL --> AG["🤖 Executive Agents"]
-    AG --> LLM["🧠 Shared Qwen2.5-3B-Instruct"]
+    MODE --> FAST[Fast Intelligence]
+    MODE --> DEEP[Deep Boardroom Workflow]
 
-    API --> RET["🔎 Retrieval Components"]
-    RET --> EMB["Embeddings: all-MiniLM-L6-v2"]
-    RET --> DB["🗃️ ChromaDB"]
+    DEEP --> SELECT[Executive Selection]
+    SELECT --> AGENTS[Specialized AI Agents]
+    AGENTS --> DEBATE[Debate Stage]
+    DEBATE --> CEO[CEO Synthesis]
 
-    AG --> DEB["🗣️ Executive Debate"]
-    DEB --> CEO["👑 CEO Final Decision"]
-    CEO --> VAL["✅ Decision Validation"]
+    FAST --> RESULT[Analysis Output]
+    CEO --> RESULT
 
-    LLM --> AG
-    DB --> AG
-
-    VAL --> OUT["📋 Structured Result"]
-    OUT --> API
-    API --> FE
+    RESULT --> UI
+    UI --> U
 ```
 
----
+### Architecture Components
 
-# 🛠️ Technology Stack
-
-| Layer | Technology |
+| Component | Responsibility |
 |---|---|
-| 🌐 Frontend | HTML, CSS, JavaScript |
-| ⚡ Backend API | FastAPI |
-| 🚀 Server | Uvicorn |
-| 🧠 Language model | Qwen2.5-3B-Instruct |
-| 🧮 Quantization | 4-bit NF4 configuration |
-| 🔥 ML framework | PyTorch |
-| 🔎 Embeddings | all-MiniLM-L6-v2 |
-| 🗃️ Vector database | ChromaDB |
-| ☁️ Frontend deployment | Render |
-| 🔗 Local backend exposure | Cloudflare Tunnel |
+| Frontend | User interaction and result presentation |
+| FastAPI | Backend application and API endpoints |
+| Agent workflow | Coordinates executive analysis |
+| Language model | Generates AI analysis and responses |
+| CEO synthesis | Consolidates agent insights |
+| Deployment platform | Hosts the public application |
 
 ---
 
-# 📂 Project Structure
+## 🛠️ Technology Stack
 
-The following is a high-level representation based on the project files discussed previously.
+### Backend & AI
 
-```text
-AI-Boardroom/
-│
-├── frontend/
-│   ├── index.html
-│   ├── boardroom.html
-│   └── ...
-│
-├── backend/
-│   └── app/
-│       ├── main.py
-│       ├── api/
-│       │   └── routes.py
-│       └── ...
-│
-├── tests/
-│   └── test_debate.py
-│
-├── requirements.txt
-├── .gitignore
-└── README.md
-```
+- **Python** — Core application language
+- **FastAPI** — Backend API framework
+- **PyTorch** — Deep learning framework
+- **Qwen2.5-3B-Instruct** — Language model used in the local model workflow
+- **4-bit NF4 quantization** — Model quantization configuration
+- **Sentence Transformers** — Text embedding workflow
+- **ChromaDB** — Vector database component
 
-> This is not a verified complete file tree. Update it if your current repository contains additional modules, configuration files, or directories.
+### Deployment & Development
+
+- **Render** — Public application deployment
+- **Cloudflare Tunnel** — Temporary public access to a local server during development
+- **Uvicorn** — ASGI server
+- **GitHub** — Source code and version control
 
 ---
 
-# ⚙️ Installation
+## 🚀 Getting Started
 
-## 1️⃣ Clone the repository
+Run the backend locally to explore the application.
+
+### Prerequisites
+
+- Python installed
+- Git installed
+- Project dependencies available
+- Model access and sufficient hardware resources for the configured local inference workflow
+
+### 1. Clone the Repository
 
 ```bash
 git clone https://github.com/krushnakodgirwar/AI-Boardroom.git
 ```
 
-## 2️⃣ Navigate to the project directory
+### 2. Navigate to the Project
 
 ```bash
 cd AI-Boardroom
 ```
 
-## 3️⃣ Create a virtual environment
+### 3. Create a Virtual Environment
 
-### Windows
+**Windows**
 
 ```bash
 python -m venv venv
 venv\Scripts\activate
 ```
 
-### macOS / Linux
+**macOS / Linux**
 
 ```bash
 python3 -m venv venv
 source venv/bin/activate
 ```
 
-## 4️⃣ Install dependencies
+### 4. Install Dependencies
+
+If the repository contains a `requirements.txt` file:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-> ⚠️ The project uses a local language model and GPU-related components. Python, PyTorch, CUDA, and quantization dependencies must be compatible with your environment.
-
----
-
-# ▶️ Run Locally
-
-## 🖥️ Start the backend
-
-From the repository root:
+### 5. Start the Backend
 
 ```bash
 python -m uvicorn backend.app.main:app --host 0.0.0.0 --port 8000
 ```
 
-If initialization succeeds, the API should be available at:
+### 6. Open the API Documentation
 
-| Service | Address |
-|---|---|
-| Backend root | http://localhost:8000 |
-| Health check | http://localhost:8000/health |
-| FastAPI docs | http://localhost:8000/docs |
+Visit:
 
-## 🌐 Open the frontend
+http://localhost:8000/docs
 
-Open the frontend entry page in your browser, or use the deployed application:
-
-👉 https://ai-boardroom-xexp.onrender.com
-
-Ensure the frontend API base URL points to the backend you intend to use.
+The interactive FastAPI documentation can help you inspect the available endpoints.
 
 ---
 
-# 🔌 API Documentation
+## 🔌 API Reference
 
-The backend is built with FastAPI.
+The following routes are part of the project's described backend interface. Confirm their current implementation and request schemas in the source code or `/docs`.
 
-## Known routes
-
-| Route | Purpose |
+| Endpoint | Purpose |
 |---|---|
-| `GET /` | Backend root |
-| `GET /health` | Health check |
-| `POST /boardroom/analyze` | Boardroom analysis |
+| `/` | Root endpoint |
+| `/health` | Health check |
+| `/boardroom/analyze` | Boardroom analysis workflow |
 | `/docs` | Interactive API documentation |
 
-The `/boardroom/analyze` route is referenced in the project's backend logs.
+### Example Request
 
-### Example request concept
+The precise request fields depend on the current API schema.
 
-The backend accepts a business question and configuration such as the selected analysis mode, response detail, and agent-selection mode.
+```http
+POST /boardroom/analyze
+Content-Type: application/json
+```
 
-The exact JSON schema should be taken from the current FastAPI `/docs` page. The request fields and response structure can change as the backend evolves.
+Use the interactive documentation to inspect the required JSON body and available parameters.
 
 ---
 
-# ☁️ Deployment
+## ☁️ Deployment
 
-## 🌍 Frontend — Render
+### 🌐 Public Application
 
-The frontend is deployed at:
+The project is deployed on Render.
 
-🔗 https://ai-boardroom-xexp.onrender.com
+**Live URL:** https://ai-boardroom-xexp.onrender.com
 
-The frontend can be hosted as a static site independently of the local AI model.
+### ☁️ Why Cloudflare Tunnel?
 
-## 🧠 Backend — Local Development
+Cloudflare Tunnel can expose a locally running backend through a temporary public URL.
 
-The backend has been run locally using Uvicorn, with Qwen2.5-3B-Instruct configured for GPU inference.
+This can be useful when testing a frontend hosted elsewhere that needs to communicate with a backend running on your own machine.
 
-## 🔗 Cloudflare Tunnel
-
-Cloudflare Tunnel can expose a local backend through a public HTTPS URL.
-
-Start the backend first, then run:
+Example:
 
 ```bash
 cloudflared tunnel --url http://localhost:8000
 ```
 
-Cloudflare will provide a temporary public URL. Configure the frontend to use that URL when connecting to your local API.
+The command can generate a temporary `trycloudflare.com` URL.
 
-<details>
-<summary><strong>⚠️ Important deployment considerations</strong></summary>
-
-- The local backend must remain running.
-- The Cloudflare tunnel must remain active.
-- A temporary tunnel URL can change after restarting the tunnel.
-- Cloudflare Tunnel forwards requests; it does not host the AI model.
-- Do not place private API keys in frontend JavaScript.
-- Avoid exposing sensitive development endpoints publicly.
-- Stable production deployment requires a backend environment with suitable memory, compute, and model-serving resources.
-
-</details>
+**Important:** A quick tunnel URL is temporary. It is not the same as a permanently deployed backend. Keep the local server running while using the tunnel.
 
 ---
 
-# 🧪 Example Scenario
+## 🧪 Example Use Case
 
-A user wants to evaluate whether a small SaaS company should launch a new project-management product.
+### Scenario: Should a startup expand into a new market?
 
-Example information:
+**Business challenge:**
 
-- Available investment budget: ₹20 lakh
-- Estimated development cost: ₹8 lakh
-- Estimated annual infrastructure cost: ₹2 lakh
-- Engineering team: 3 developers
-- Existing customer base: 2,000 users
-- Proposed subscription price: ₹999 per month
-- No customer demand survey completed
-- No competitor analysis completed
-- No technical prototype tested
+> A growing startup is considering expansion into a new market. Analyze the financial, technical, operational, and marketing implications, and propose a strategic approach.
 
-The boardroom can be configured to analyze this scenario through selected executives.
+### How the Boardroom Could Approach It
 
-Potential perspectives include:
-
-| Agent | Analysis focus |
+| Executive | Example analysis focus |
 |---|---|
-| CFO | Budget, costs, revenue assumptions, financial uncertainty |
-| CTO | Prototype, engineering resources, technical feasibility |
-| Risk Officer | Unknowns, risks, and missing validation |
-| CEO | Synthesis and next-step decision |
+| CFO | Budget, costs, and financial exposure |
+| CTO | Technical readiness and infrastructure |
+| CMO | Customer demand and market positioning |
+| COO | Operational capacity and execution |
+| Risk Officer | Potential risks and mitigation |
+| CEO | Consolidated strategic recommendation |
 
-The project's test logs demonstrate this type of multi-executive analysis and a CEO decision-validation stage.
+The generated response is an AI-assisted analysis, not a substitute for independent business research or professional advice.
 
-> This is an illustrative project test scenario, not a verified real-world business recommendation.
-
-
-
----
-
-# 🔮 Future Improvements
-
-- ☁️ Stable backend hosting
-- 🔐 Authentication and access controls
-- 📊 Richer analysis and comparison dashboards
-- 📑 Exportable executive reports
-- 🧠 More configurable language models
-- 🔎 Improved evidence retrieval and source visibility
-- 📈 Evaluation of agent output quality
-- 🗂️ Persistent analysis history
-- 🧪 Automated API and end-to-end tests
-- ⚙️ More detailed configuration for agent workflows
 
 ---
 
-# 🧪 Development & Testing
+## 🔮 Future Enhancements
 
-The project includes a debate test module referenced in prior development logs.
+Potential directions for further development:
 
-Run the test module from the project root:
-
-```bash
-python -m tests.test_debate
-```
-
-The test output previously showed:
-
-- Shared Qwen model initialization
-- Selected executive agents
-- Executive analyses
-- Debate handling
-- CEO final decision
-- Decision validation
-
-Actual test results depend on the current code, dependencies, model availability, and hardware.
+- 📊 Interactive financial and business dashboards
+- 🧠 Improved agent memory and context sharing
+- 🔄 More advanced agent coordination
+- 📚 Retrieval-augmented generation with business knowledge
+- 📈 Quantitative scenario comparison
+- 📄 Exportable boardroom reports
+- 🔐 User accounts and saved analysis sessions
+- 🧪 Automated evaluation of agent responses
+- 🌍 Scalable inference and deployment architecture
 
 ---
 
-# 👨‍💻 Author
+## 👨‍💻 Author
 
-<p align="center">
-  <strong>Krushna Kodgirwar</strong><br>
-  B.Tech Computer Science Engineering<br>
-  Vishwakarma Institute of Technology (VIT), Pune
-</p>
+<div align="center">
 
-<p align="center">
-  <a href="https://github.com/krushnakodgirwar">
-    <img src="https://img.shields.io/badge/GitHub-Krushna_Kodgirwar-181717?style=for-the-badge&logo=github">
-  </a>
-</p>
+### Krushna Kodgirwar
+
+B.Tech Computer Science Engineering  
+Vishwakarma Institute of Technology, Pune
+
+<br/>
+
+[![GitHub](https://img.shields.io/badge/GitHub-krushnakodgirwar-181717?style=for-the-badge&logo=github)](https://github.com/krushnakodgirwar)
+
+[![Project Repository](https://img.shields.io/badge/Project-AI--Boardroom-6C5CE7?style=for-the-badge&logo=github)](https://github.com/krushnakodgirwar/AI-Boardroom)
+
+</div>
 
 ---
 
-<p align="center">
-  <strong>🏛️ AI Boardroom OS</strong><br>
-  <em>Multiple perspectives. Structured intelligence. Better-informed decisions.</em>
-</p>
+<div align="center">
 
-<p align="center">
-  <a href="https://ai-boardroom-xexp.onrender.com">🚀 Launch Live Application</a>
-  &nbsp;·&nbsp;
-  <a href="https://github.com/krushnakodgirwar/AI-Boardroom">⭐ Explore GitHub Repository</a>
-</p>
+### 🏛️ AI BOARDROOM OS
+
+**Multiple perspectives. Structured analysis. Human-led decisions.**
+
+[🚀 Open Live Demo](https://ai-boardroom-xexp.onrender.com) · [💻 Explore Source Code](https://github.com/krushnakodgirwar/AI-Boardroom)
+
+</div>
