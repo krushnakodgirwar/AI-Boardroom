@@ -592,18 +592,7 @@ The project's test logs demonstrate this type of multi-executive analysis and a 
 
 > This is an illustrative project test scenario, not a verified real-world business recommendation.
 
----
 
-# ⚠️ Limitations
-
-- AI-generated analysis may contain errors or incomplete assumptions.
-- Results depend on the quality of the user-provided information.
-- A local model requires sufficient compute and memory.
-- Full AI functionality depends on backend availability and frontend connectivity.
-- Automatic agent selection depends on the implemented selection logic.
-- Retrieval quality depends on the available documents and configured retrieval pipeline.
-- Decision validation checks consistency against implemented rules; it does not prove that a business decision is correct.
-- The system should not be treated as a replacement for professional judgment.
 
 ---
 
