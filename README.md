@@ -1,5 +1,5 @@
 
-# 🏛️ AI Boardroom OS
+<h1 align="center">🏛️ AI Boardroom OS</h1>
 ### Where AI Agents Think Together
 
 <p align="center">
@@ -593,6 +593,225 @@ The project's test logs demonstrate this type of multi-executive analysis and a 
 > This is an illustrative project test scenario, not a verified real-world business recommendation.
 
 
+# 👥 Meet the AI Executive Board
+
+<div align="center">
+
+### 🏛️ YOUR VIRTUAL C-SUITE
+
+**11 executive perspectives. One simulated boardroom.**
+
+Each AI executive focuses on a different business function, bringing specialized analysis into the decision-making process.
+
+</div>
+
+---
+
+## 👑 The Final Decision Maker
+
+<table>
+<tr>
+<td align="center" width="100%">
+
+# 👑 CEO
+### Chief Executive Officer
+
+**THE STRATEGIC LEADER**
+
+Brings together the available executive analyses, considers strategic trade-offs, and generates the final CEO-level decision.
+
+`STRATEGY` · `SYNTHESIS` · `FINAL DECISION`
+
+</td>
+</tr>
+</table>
+
+---
+
+## 🧠 The Executive Team
+
+<table>
+<tr>
+<td align="center" width="50%">
+
+## 💰 CFO
+
+### Chief Financial Officer
+
+**FINANCE & PROFITABILITY**
+
+Evaluates financial feasibility, budgets, costs, revenue assumptions, and financial risks.
+
+`BUDGET` · `COSTS` · `ROI`
+
+</td>
+<td align="center" width="50%">
+
+## 💻 CTO
+
+### Chief Technology Officer
+
+**TECHNOLOGY & INNOVATION**
+
+Examines technical feasibility, architecture, engineering requirements, and technology-related challenges.
+
+`TECHNOLOGY` · `ARCHITECTURE` · `R&D`
+
+</td>
+</tr>
+
+<tr>
+<td align="center" width="50%">
+
+## 📣 CMO
+
+### Chief Marketing Officer
+
+**MARKETING & BRAND**
+
+Analyzes market positioning, customer acquisition, branding, and marketing strategy.
+
+`MARKETING` · `CUSTOMERS` · `BRAND`
+
+</td>
+<td align="center" width="50%">
+
+## ⚙️ COO
+
+### Chief Operating Officer
+
+**OPERATIONS & EXECUTION**
+
+Considers operational readiness, resource allocation, execution plans, and process efficiency.
+
+`OPERATIONS` · `EXECUTION` · `RESOURCES`
+
+</td>
+</tr>
+
+<tr>
+<td align="center" width="50%">
+
+## 🎯 CSO
+
+### Chief Strategy Officer
+
+**GROWTH & STRATEGY**
+
+Examines strategic direction, business opportunities, competitive positioning, and long-term growth.
+
+`GROWTH` · `STRATEGY` · `COMPETITION`
+
+</td>
+<td align="center" width="50%">
+
+## 📦 CPO
+
+### Chief Product Officer
+
+**PRODUCT & CUSTOMER NEEDS**
+
+Evaluates product direction, customer requirements, product development, and value creation.
+
+`PRODUCT` · `USER NEEDS` · `ROADMAP`
+
+</td>
+</tr>
+
+<tr>
+<td align="center" width="50%">
+
+## ⚖️ LEGAL
+
+### Legal Executive
+
+**COMPLIANCE & LEGAL**
+
+Highlights legal considerations, regulatory requirements, and potential compliance issues.
+
+`COMPLIANCE` · `REGULATIONS` · `LEGAL`
+
+</td>
+<td align="center" width="50%">
+
+## 🛡️ RISK OFFICER
+
+### Chief Risk Officer
+
+**RISK & UNCERTAINTY**
+
+Identifies potential risks, uncertainties, vulnerabilities, and possible mitigation approaches.
+
+`RISK` · `UNCERTAINTY` · `MITIGATION`
+
+</td>
+</tr>
+
+<tr>
+<td align="center" width="50%">
+
+## 👥 CHRO
+
+### Chief Human Resources Officer
+
+**PEOPLE & ORGANIZATION**
+
+Considers workforce requirements, hiring, organizational structure, and people-related impacts.
+
+`PEOPLE` · `HIRING` · `CULTURE`
+
+</td>
+<td align="center" width="50%">
+
+## 📈 CRO
+
+### Chief Revenue Officer
+
+**REVENUE & COMMERCIAL GROWTH**
+
+Examines revenue generation, sales strategy, commercial opportunities, and customer growth.
+
+`REVENUE` · `SALES` · `GROWTH`
+
+</td>
+</tr>
+</table>
+
+---
+
+## 🔄 How the Executives Work Together
+
+<div align="center">
+
+**YOUR BUSINESS CHALLENGE**
+
+⬇️
+
+### 👥 Specialized Executive Analysis
+
+CFO · CTO · CMO · COO · CSO · CPO · Legal · Risk · CHRO · CRO
+
+⬇️
+
+### 🗣️ Executive Debate
+
+Explore different perspectives and strategic trade-offs.
+
+⬇️
+
+### 👑 CEO Decision
+
+Synthesize the available insights into a final decision.
+
+⬇️
+
+### 📋 Structured Boardroom Output
+
+</div>
+
+---
+
+> **Note:** Executive roles represent simulated AI perspectives, not real human executives. The active roster and workflow depend on the backend configuration. The CEO is shown as the final decision stage.
 
 ---
 
